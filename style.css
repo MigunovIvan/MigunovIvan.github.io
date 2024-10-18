@@ -33,8 +33,20 @@ h1 {
     border-radius: 5px;
     margin: 15px;
     padding: 20px;
-    width: 250px;
+    width: 300px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.project img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.project h3 {
+    font-size: 1.2em;
+    margin: 0 0 10px;
 }
 
 .project a {
@@ -42,8 +54,9 @@ h1 {
     color: #333;
 }
 
-.project a:hover {
-    text-decoration: underline;
+.project p {
+    font-size: 0.9em;
+    color: #666;
 }
 
 footer {
