@@ -42,13 +42,22 @@ h1 {
     padding: 20px;
     width: 300px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-.project img {
+.project img.cover {
     width: 100%;
     height: auto;
     border-radius: 5px;
     margin-bottom: 10px;
+}
+
+.project img.windows-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
 }
 
 .project h3 {

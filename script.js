@@ -9,6 +9,9 @@ const repoDescriptions = {
     "Meteo_Chisinau": "Новая программа для прогноза погоды — \"Meteo Chisinau\"! Прогноз на сегодня и завтра, часовой прогноз, поддержка светлого и тёмного режимов."
 };
 
+// Репозитории с приложениями для Windows
+const windowsProjects = ["Time_Chisinau", "News_Moldova", "Facebook_Auto_Lo-gin", "Meteo_Chisinau"];
+
 // Функция для получения списка репозиториев
 async function fetchGitHubProjects() {
     try {
@@ -30,7 +33,8 @@ function displayProjects(projects) {
         const repoDescription = repoDescriptions[repoName] || project.description || 'No description provided.';
 
         projectElement.innerHTML = `
-            <img src="https://raw.githubusercontent.com/${username}/${repoName}/main/cover.png" alt="${repoName} cover" onerror="this.src='default-cover.png';">
+            <img class="cover" src="https://raw.githubusercontent.com/${username}/${repoName}/main/cover.png" alt="${repoName} cover" onerror="this.src='default-cover.png';">
+            ${windowsProjects.includes(repoName) ? `<img class="windows-icon" src="Windows.png" alt="Windows">` : ''}
             <h3><a href="${project.html_url}" target="_blank">${project.name}</a></h3>
             <p>${repoDescription}</p>
         `;
