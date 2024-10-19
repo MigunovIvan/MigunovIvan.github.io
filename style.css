@@ -16,6 +16,13 @@ h1 {
     margin: 0;
 }
 
+#profile-photo {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    margin-bottom: 20px;
+}
+
 #projects {
     padding: 20px;
     background-color: #fff;
