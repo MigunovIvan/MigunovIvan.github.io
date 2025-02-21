@@ -1,25 +1,20 @@
-document.getElementById('toggle-theme').addEventListener('click', function() {
-    document.body.classList.toggle('dark-mode');
-});
+document.addEventListener("DOMContentLoaded", function () {
+    const themeToggle = document.getElementById("toggle-theme");
+    const body = document.body;
 
-// Функция для загрузки проектов с GitHub
-async function fetchGitHubRepos() {
-    let response = await fetch("https://api.github.com/users/MigunovIvan/repos");
-    let repos = await response.json();
-    let projectList = document.getElementById("project-list");
+    // Проверяем сохраненную тему в localStorage
+    if (localStorage.getItem("theme") === "dark") {
+        body.classList.add("dark-mode");
+    }
 
-    repos.forEach(repo => {
-        let projectDiv = document.createElement("div");
-        projectDiv.classList.add("project-card");
-        projectDiv.innerHTML = `
-            <h3>${repo.name}</h3>
-            <p>${repo.description || "No description available"}</p>
-            <a href="${repo.html_url}" target="_blank">🔗 View on GitHub</a>
-            <br>
-            <img src="Windows.png" alt="Windows Icon" class="windows-icon">
-        `;
-        projectList.appendChild(projectDiv);
+    themeToggle.addEventListener("click", function () {
+        body.classList.toggle("dark-mode");
+
+        // Сохраняем состояние темы в localStorage
+        if (body.classList.contains("dark-mode")) {
+            localStorage.setItem("theme", "dark");
+        } else {
+            localStorage.setItem("theme", "light");
+        }
     });
-}
-
-fetchGitHubRepos();
+});
