@@ -3,45 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои проекты на GitHub</title>
+    <title>Мои проекты</title>
     <link rel="stylesheet" href="styles.css">
     <script defer src="script.js"></script>
 </head>
 <body>
     <header>
-        <img id="profile-photo" src="profile.jpg" alt="Фото профиля">
-        <h1>Мои проекты</h1>
-        <button id="toggle-theme">Переключить тему</button>
+        <div class="profile">
+            <img id="profile-photo" src="images/profile.jpg" alt="Фото профиля">
+            <h1>Мои проекты</h1>
+        </div>
+        <button id="toggle-theme" class="theme-btn">🌙</button>
     </header>
 
-    <div class="container">
-        <div class="grid-container">
+    <main>
+        <div class="projects">
             <div class="project-card">
-                <img src="Time_Chisinau.png" alt="Time Chisinau">
-                <h3>Time Chisinau</h3>
-                <p>Точная информация о дате и времени в Кишинёве...</p>
-                <img class="windows-icon" src="Windows.png" alt="Windows">
+                <img src="images/Time_Chisinau.png" alt="Time Chisinau" class="project-image">
+                <div class="project-info">
+                    <h3>Time Chisinau</h3>
+                    <p>Точная информация о дате и времени в Кишинёве.</p>
+                    <button class="expand-btn">Развернуть</button>
+                </div>
+                <img class="windows-icon" src="images/Windows.png" alt="Windows">
             </div>
             <div class="project-card">
-                <img src="News_Moldova.png" alt="News Moldova">
-                <h3>News Moldova</h3>
-                <p>Открывай группу на Windows в 1 клик!</p>
-                <img class="windows-icon" src="Windows.png" alt="Windows">
+                <img src="images/News_Moldova.png" alt="News Moldova" class="project-image">
+                <div class="project-info">
+                    <h3>News Moldova</h3>
+                    <p>Открытие группы на Windows в 1 клик.</p>
+                    <button class="expand-btn">Развернуть</button>
+                </div>
+                <img class="windows-icon" src="images/Windows.png" alt="Windows">
             </div>
             <div class="project-card">
-                <img src="Facebook_Auto_Login.png" alt="Facebook Auto Login">
-                <h3>Facebook Auto Login</h3>
-                <p>Автоматический вход в Facebook аккаунты...</p>
-                <img class="windows-icon" src="Windows.png" alt="Windows">
+                <img src="images/Facebook_Auto_Login.png" alt="Facebook Auto Login" class="project-image">
+                <div class="project-info">
+                    <h3>Facebook Auto Login</h3>
+                    <p>Автоматический вход в Facebook аккаунты.</p>
+                    <button class="expand-btn">Развернуть</button>
+                </div>
+                <img class="windows-icon" src="images/Windows.png" alt="Windows">
             </div>
             <div class="project-card">
-                <img src="Meteo_Chisinau.png" alt="Meteo Chisinau">
-                <h3>Meteo Chisinau</h3>
-                <p>Простая программа для прогноза погоды...</p>
-                <img class="windows-icon" src="Windows.png" alt="Windows">
+                <img src="images/Meteo_Chisinau.png" alt="Meteo Chisinau" class="project-image">
+                <div class="project-info">
+                    <h3>Meteo Chisinau</h3>
+                    <p>Прогноз погоды в Кишинёве.</p>
+                    <button class="expand-btn">Развернуть</button>
+                </div>
+                <img class="windows-icon" src="images/Windows.png" alt="Windows">
             </div>
         </div>
-    </div>
+    </main>
 
     <footer>
         <p>© 2025 MigunovIvan</p>
