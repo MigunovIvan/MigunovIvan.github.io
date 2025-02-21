@@ -1,3 +1,4 @@
+/* Основные стили */
 body {
     font-family: Arial, sans-serif;
     background: #f4f4f4;
@@ -22,6 +23,7 @@ body {
     color: white;
 }
 
+/* Шапка */
 header {
     display: flex;
     justify-content: space-between;
@@ -55,6 +57,7 @@ header {
     transition: 0.3s;
 }
 
+/* Карточки проектов */
 .projects {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -93,6 +96,15 @@ header {
     font-size: 1.2em;
 }
 
+.hidden-content {
+    display: none;
+    padding: 10px 0;
+}
+
+.hidden-content.visible {
+    display: block;
+}
+
 .expand-btn {
     margin-top: 15px;
     padding: 10px 20px;
@@ -116,6 +128,7 @@ header {
     right: 10px;
 }
 
+/* Подвал */
 footer {
     text-align: center;
     padding: 20px;
@@ -124,6 +137,7 @@ footer {
     margin-top: 30px;
 }
 
+/* Адаптив */
 @media (max-width: 768px) {
     .projects {
         grid-template-columns: 1fr;
