@@ -4,11 +4,11 @@ document.getElementById('toggle-theme').addEventListener('click', function () {
     this.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
 });
 
-// Раскрытие проектов
+// Раскрытие контента
 document.querySelectorAll('.expand-btn').forEach(button => {
     button.addEventListener('click', function () {
-        const projectInfo = this.closest('.project-card');
-        const hiddenContent = projectInfo.querySelector('.hidden-content');
+        const projectCard = this.closest('.project-card');
+        const hiddenContent = projectCard.querySelector('.hidden-content');
         
         if (hiddenContent) {
             hiddenContent.classList.toggle('visible');
