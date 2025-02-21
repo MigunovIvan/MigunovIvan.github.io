@@ -1,111 +1,105 @@
-/* Общие стили */
+
 body {
     font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    color: #333;
     margin: 0;
     padding: 0;
-    text-align: center;
-    transition: background 0.3s, color 0.3s;
+    transition: 0.3s;
 }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
+.dark-mode {
+    background: #222;
+    color: #fff;
 }
 
-/* Шапка */
 header {
-    background: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #0088cc;
     color: white;
-    padding: 20px;
-    border-radius: 10px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
 }
 
 #profile-photo {
-    width: 120px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
-    margin-bottom: 10px;
+    margin-right: 10px;
 }
 
-/* Сетка проектов */
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+.theme-btn {
+    padding: 10px;
+    background: white;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.projects {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
 }
 
 .project-card {
     background: white;
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: left;
+    width: 250px;
+    text-align: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
     position: relative;
 }
 
-.project-card img {
+.project-card:hover {
+    transform: scale(1.05);
+}
+
+.project-image {
     width: 100%;
     border-radius: 5px;
 }
 
-.project-card h3 {
-    font-size: 18px;
-    margin: 10px 0;
+.project-info h3 {
+    margin: 10px 0 5px;
 }
 
-.project-card p {
-    font-size: 14px;
-    color: #555;
+.expand-btn {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #0088cc;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
-/* Иконка Windows */
+.expand-btn:hover {
+    background: #005f99;
+}
+
 .windows-icon {
     width: 30px;
-    height: auto;
+    height: 30px;
     position: absolute;
     top: 10px;
     right: 10px;
 }
 
-/* Кнопка темы */
-#toggle-theme {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-    background: #333;
-    color: white;
-    transition: background 0.3s;
-}
-
-#toggle-theme:hover {
-    background: #555;
-}
-
-/* Темная тема */
-.dark-mode {
-    background: #222;
-    color: white;
-}
-
-.dark-mode .project-card {
-    background: #333;
-    color: white;
-}
-
-.dark-mode #toggle-theme {
-    background: white;
-    color: black;
-}
-
-/* Подвал */
 footer {
-    margin-top: 20px;
-    padding: 10px;
-    background: #333;
+    text-align: center;
+    padding: 15px;
+    background: #0088cc;
     color: white;
-    border-radius: 10px;
+    margin-top: 20px;
 }
