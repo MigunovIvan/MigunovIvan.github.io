@@ -1,47 +1,22 @@
-const username = "MigunovIvan";  // Твой GitHub username
-const projectList = document.getElementById('project-list');
+document.getElementById('toggle-theme').addEventListener('click', function() {
+    document.body.classList.toggle('dark-mode');
+});
 
-// Описания для репозиториев
-const repoDescriptions = {
-    "Time_Chisinau": "Точная информация о дате и времени в Кишинёве. Удобный интерфейс. Легкость в использовании. 💻 Виджет на Windows, который можно добавить в автозагрузку. Для использования достаточно скачать на ПК и запустить Time.exe. 👉 Адаптирован для тёмной темы Windows.",
-    "News_Moldova": "Deschide instant grupul pe Windows cu un singур clic! Открывай группу на Windows в 1 клик!",
-    "Facebook_Auto_Lo-gin": "🚀 Новый проект на GitHub: Facebook Auto Login. Сэкономьте время с автоматическим входом в Facebook! Простой интерфейс, поддержка нескольких профилей, хранение логинов и паролей. Вход в один клик. Бесплатный и open-source. 🌟 Попробуйте сейчас!",
-    "Meteo_Chisinau": "Новая программа для прогноза погоды — \"Meteo Chisinau\"! Прогноз на сегодня и завтра, часовой прогноз, поддержка светлого и тёмного режимов."
-};
+async function fetchGitHubRepos() {
+    let response = await fetch("https://api.github.com/users/MigunovIvan/repos");
+    let repos = await response.json();
+    let projectList = document.getElementById("project-list");
 
-// Репозитории с приложениями для Windows
-const windowsProjects = ["Time_Chisinau", "News_Moldova", "Facebook_Auto_Lo-gin", "Meteo_Chisinau"];
-
-// Функция для получения списка репозиториев
-async function fetchGitHubProjects() {
-    try {
-        const response = await fetch(`https://api.github.com/users/${username}/repos`);
-        const projects = await response.json();
-        displayProjects(projects);
-    } catch (error) {
-        console.error('Error fetching GitHub projects:', error);
-    }
-}
-
-// Функция для отображения репозиториев
-function displayProjects(projects) {
-    projects.forEach(project => {
-        const projectElement = document.createElement('div');
-        projectElement.classList.add('project');
-
-        const repoName = project.name;
-        const repoDescription = repoDescriptions[repoName] || project.description || 'No description provided.';
-
-        projectElement.innerHTML = `
-            <img class="cover" src="https://raw.githubusercontent.com/${username}/${repoName}/main/cover.png" alt="${repoName} cover" onerror="this.src='default-cover.png';">
-            ${windowsProjects.includes(repoName) ? `<img class="windows-icon" src="Windows.png" alt="Windows">` : ''}
-            <h3><a href="${project.html_url}" target="_blank">${project.name}</a></h3>
-            <p>${repoDescription}</p>
+    repos.forEach(repo => {
+        let projectDiv = document.createElement("div");
+        projectDiv.innerHTML = `
+            <h3>${repo.name}</h3>
+            <p>${repo.description || "No description available"}</p>
+            <a href="${repo.html_url}" target="_blank">View on GitHub</a>
+            <img src="Windows.png" alt="Windows Icon" class="windows-icon">
         `;
-
-        projectList.appendChild(projectElement);
+        projectList.appendChild(projectDiv);
     });
 }
 
-// Запуск функции для загрузки проектов при загрузке страницы
-fetchGitHubProjects();
+fetchGitHubRepos();
