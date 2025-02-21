@@ -41,6 +41,7 @@ header {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: left;
+    position: relative;
 }
 
 .project-card img {
@@ -56,6 +57,15 @@ header {
 .project-card p {
     font-size: 14px;
     color: #555;
+}
+
+/* Иконка Windows */
+.windows-icon {
+    width: 30px;
+    height: auto;
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
 /* Кнопка темы */
