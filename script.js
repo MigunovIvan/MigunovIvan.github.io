@@ -1,20 +1,11 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const themeToggle = document.getElementById("toggle-theme");
-    const body = document.body;
+document.getElementById('toggle-theme').addEventListener('click', function () {
+    document.body.classList.toggle('dark-mode');
+});
 
-    // Проверяем сохраненную тему в localStorage
-    if (localStorage.getItem("theme") === "dark") {
-        body.classList.add("dark-mode");
-    }
-
-    themeToggle.addEventListener("click", function () {
-        body.classList.toggle("dark-mode");
-
-        // Сохраняем состояние темы в localStorage
-        if (body.classList.contains("dark-mode")) {
-            localStorage.setItem("theme", "dark");
-        } else {
-            localStorage.setItem("theme", "light");
-        }
+document.querySelectorAll('.expand-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const projectInfo = this.parentElement;
+        projectInfo.classList.toggle('expanded');
+        this.textContent = projectInfo.classList.contains('expanded') ? 'Назад' : 'Развернуть';
     });
 });
