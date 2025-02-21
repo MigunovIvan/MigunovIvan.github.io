@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мои проекты</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
 <body>
     <header>
         <div class="profile">
-            <img id="profile-photo" src="images/profile.jpg" alt="Фото профиля">
+            <img id="profile-photo" src="https://github.com/username.png" alt="Фото профиля">
             <h1>Мои проекты</h1>
         </div>
         <button id="toggle-theme" class="theme-btn">🌙</button>
@@ -18,42 +18,20 @@
 
     <main>
         <div class="projects">
+            <!-- Пример одной карточки (замените остальные аналогично) -->
             <div class="project-card">
                 <img src="images/Time_Chisinau.png" alt="Time Chisinau" class="project-image">
+                <img class="windows-icon" src="images/Windows.png" alt="Windows">
                 <div class="project-info">
                     <h3>Time Chisinau</h3>
                     <p>Точная информация о дате и времени в Кишинёве.</p>
+                    <div class="hidden-content">
+                        <p>Дополнительные детали проекта...</p>
+                    </div>
                     <button class="expand-btn">Развернуть</button>
                 </div>
-                <img class="windows-icon" src="images/Windows.png" alt="Windows">
             </div>
-            <div class="project-card">
-                <img src="images/News_Moldova.png" alt="News Moldova" class="project-image">
-                <div class="project-info">
-                    <h3>News Moldova</h3>
-                    <p>Открытие группы на Windows в 1 клик.</p>
-                    <button class="expand-btn">Развернуть</button>
-                </div>
-                <img class="windows-icon" src="images/Windows.png" alt="Windows">
-            </div>
-            <div class="project-card">
-                <img src="images/Facebook_Auto_Login.png" alt="Facebook Auto Login" class="project-image">
-                <div class="project-info">
-                    <h3>Facebook Auto Login</h3>
-                    <p>Автоматический вход в Facebook аккаунты.</p>
-                    <button class="expand-btn">Развернуть</button>
-                </div>
-                <img class="windows-icon" src="images/Windows.png" alt="Windows">
-            </div>
-            <div class="project-card">
-                <img src="images/Meteo_Chisinau.png" alt="Meteo Chisinau" class="project-image">
-                <div class="project-info">
-                    <h3>Meteo Chisinau</h3>
-                    <p>Прогноз погоды в Кишинёве.</p>
-                    <button class="expand-btn">Развернуть</button>
-                </div>
-                <img class="windows-icon" src="images/Windows.png" alt="Windows">
-            </div>
+            <!-- Остальные карточки добавляйте по аналогии -->
         </div>
     </main>
 
