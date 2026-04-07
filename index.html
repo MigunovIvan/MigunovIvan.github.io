@@ -2,74 +2,55 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Мигунов Иван | Портфолио проектов</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Иван Мигунов · Проекты</title>
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
 <body>
-    <div class="glass-bg"></div>
-    <header class="modern-header">
-        <div class="container header-flex">
-            <div class="profile-area">
-                <div class="avatar-wrapper">
-                    <img id="profile-photo" src="images/profile.jpg" alt="Аватар Ивана Мигунова">
-                </div>
-                <div class="title-greeting">
-                    <h1>Мои проекты</h1>
-                    <p class="subhead">Творческий код, современные решения</p>
+
+    <header>
+        <div class="header-inner">
+            <div class="avatar">
+                <img src="images/profile.jpg" alt="Ivan Migunov" id="profile-photo">
+                <div>
+                    <h1>Иван Мигунов</h1>
+                    <p>frontend & pet‑проекты</p>
                 </div>
             </div>
-            <button id="toggle-theme" class="theme-toggle" aria-label="Переключить тему">
-                <i class="fas fa-moon"></i>
-                <i class="fas fa-sun"></i>
-            </button>
+            <button id="toggle-theme" class="theme-switch" aria-label="Тёмная тема">🌙</button>
         </div>
     </header>
 
     <main>
-        <div class="container">
-            <!-- Панель управления (поиск + сортировка + счётчик) -->
-            <div class="controls-panel">
-                <div class="search-wrapper">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-input" placeholder="Поиск по названию или описанию..." autocomplete="off">
-                </div>
-                <div class="sort-wrapper">
-                    <i class="fas fa-sort-amount-down-alt"></i>
-                    <select id="sort-select">
-                        <option value="name">По имени (А–Я)</option>
-                        <option value="stars">По звёздам (убыв.)</option>
-                        <option value="updated">Недавние обновления</option>
-                    </select>
-                </div>
-                <div class="projects-counter" id="projects-counter">
-                    <span>0</span> проектов
-                </div>
+        <div class="toolbar">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" id="search" placeholder="Название или описание...">
             </div>
+            <div class="sort-box">
+                <label>📋 Сортировать:</label>
+                <select id="sort">
+                    <option value="name">по имени</option>
+                    <option value="stars">⭐ по звёздам</option>
+                    <option value="updated">🕒 по обновлению</option>
+                </select>
+            </div>
+            <div class="counter" id="counter">проектов: <span>0</span></div>
+        </div>
 
-            <!-- Сетка проектов + скелетоны загрузки -->
-            <div id="project-container" class="projects-grid">
-                <!-- Скелетоны будут добавлены через JS -->
-            </div>
+        <div id="projects-grid" class="projects-grid">
+            <!-- скелетоны или карточки -->
+        </div>
 
-            <!-- Сообщение об ошибке / пустое состояние -->
-            <div id="error-message" class="error-state" style="display: none;">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>Не удалось загрузить проекты</p>
-                <button id="retry-btn" class="retry-btn">Повторить <i class="fas fa-sync-alt"></i></button>
-            </div>
+        <div id="error-message" class="error-message" style="display: none;">
+            ⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button>
         </div>
     </main>
 
-    <footer class="modern-footer">
-        <div class="container">
-            <p>© 2025 Мигунов Иван — <i class="fab fa-github"></i> <a href="https://github.com/MigunovIvan" target="_blank" rel="noopener">GitHub</a> — Вдохновение и код</p>
-        </div>
+    <footer>
+        <p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">GitHub</a></p>
     </footer>
+
 </body>
 </html>
