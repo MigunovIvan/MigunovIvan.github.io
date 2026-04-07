@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Иван Мигунов · Проекты</title>
+    <title>Иван Мигунов · Портфолио</title>
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
@@ -22,34 +22,73 @@
         </div>
     </header>
 
+    <!-- Навигация (только нужные разделы) -->
+    <nav class="main-nav">
+        <button class="nav-btn active" data-section="projects">📂 Проекты</button>
+        <button class="nav-btn" data-section="news">📰 Новости</button>
+        <button class="nav-btn" data-section="contact">📩 Контакты</button>
+    </nav>
+
     <main>
-        <div class="toolbar">
-            <div class="search-box">
-                <span>🔍</span>
-                <input type="text" id="search" placeholder="Название или описание...">
+        <!-- Секция: Проекты -->
+        <section id="projects-section" class="section active">
+            <div class="toolbar">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="search" placeholder="Название или описание...">
+                </div>
+                <div class="sort-box">
+                    <label>📋 Сортировать:</label>
+                    <select id="sort">
+                        <option value="name">по имени</option>
+                        <option value="stars">⭐ по звёздам</option>
+                        <option value="updated">🕒 по обновлению</option>
+                    </select>
+                </div>
+                <div class="counter" id="counter">проектов: <span>0</span></div>
             </div>
-            <div class="sort-box">
-                <label>📋 Сортировать:</label>
-                <select id="sort">
-                    <option value="name">по имени</option>
-                    <option value="stars">⭐ по звёздам</option>
-                    <option value="updated">🕒 по обновлению</option>
-                </select>
+            <div id="projects-grid" class="projects-grid"></div>
+            <div id="error-message" class="error-message" style="display: none;">
+                ⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button>
             </div>
-            <div class="counter" id="counter">проектов: <span>0</span></div>
-        </div>
+        </section>
 
-        <div id="projects-grid" class="projects-grid">
-            <!-- скелетоны или карточки -->
-        </div>
+        <!-- Секция: Новости (статичные) -->
+        <section id="news-section" class="section">
+            <div class="section-header">
+                <h2>📰 Лента новостей</h2>
+                <p>Мои мысли, идеи и анонсы</p>
+            </div>
+            <div id="news-container" class="news-grid"></div>
+        </section>
 
-        <div id="error-message" class="error-message" style="display: none;">
-            ⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button>
-        </div>
+        <!-- Секция: Контакты (реальная почта и GitHub, без фейковых форм) -->
+        <section id="contact-section" class="section">
+            <div class="section-header">
+                <h2>📩 Связаться со мной</h2>
+                <p>Всегда открыт для общения и сотрудничества</p>
+            </div>
+            <div class="contact-card">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-icon">📧</span>
+                        <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">🐙</span>
+                        <a href="https://github.com/MigunovIvan" target="_blank" rel="noopener">GitHub / MigunovIvan</a>
+                    </div>
+                </div>
+                <div class="contact-note">
+                    <p>✉️ Напишите мне на почту — отвечу в течение дня.<br>
+                    🔗 Все мои открытые проекты доступны на GitHub.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
-        <p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">GitHub</a></p>
+        <p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></p>
     </footer>
 
 </body>
