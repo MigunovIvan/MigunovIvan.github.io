@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Иван Мигунов · Портфолио</title>
     <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script>
 </head>
 <body>
 
@@ -22,74 +21,92 @@
         </div>
     </header>
 
-    <!-- Навигация (только нужные разделы) -->
     <nav class="main-nav">
         <button class="nav-btn active" data-section="projects">📂 Проекты</button>
         <button class="nav-btn" data-section="news">📰 Новости</button>
+        <button class="nav-btn" data-section="comments">💬 Гостевая книга</button>
         <button class="nav-btn" data-section="contact">📩 Контакты</button>
     </nav>
 
     <main>
-        <!-- Секция: Проекты -->
+        <!-- Проекты (без изменений) -->
         <section id="projects-section" class="section active">
             <div class="toolbar">
-                <div class="search-box">
-                    <span>🔍</span>
-                    <input type="text" id="search" placeholder="Название или описание...">
-                </div>
-                <div class="sort-box">
-                    <label>📋 Сортировать:</label>
-                    <select id="sort">
-                        <option value="name">по имени</option>
-                        <option value="stars">⭐ по звёздам</option>
-                        <option value="updated">🕒 по обновлению</option>
-                    </select>
-                </div>
+                <div class="search-box"><span>🔍</span><input type="text" id="search" placeholder="Название или описание..."></div>
+                <div class="sort-box"><label>📋 Сортировать:</label><select id="sort"><option value="name">по имени</option><option value="stars">⭐ по звёздам</option><option value="updated">🕒 по обновлению</option></select></div>
                 <div class="counter" id="counter">проектов: <span>0</span></div>
             </div>
             <div id="projects-grid" class="projects-grid"></div>
-            <div id="error-message" class="error-message" style="display: none;">
-                ⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button>
-            </div>
+            <div id="error-message" class="error-message" style="display: none;">⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button></div>
         </section>
 
-        <!-- Секция: Новости (статичные) -->
+        <!-- Новости (из Firestore) -->
         <section id="news-section" class="section">
-            <div class="section-header">
-                <h2>📰 Лента новостей</h2>
-                <p>Мои мысли, идеи и анонсы</p>
-            </div>
+            <div class="section-header"><h2>📰 Лента новостей</h2><p>Актуальные обновления</p></div>
             <div id="news-container" class="news-grid"></div>
         </section>
 
-        <!-- Секция: Контакты (реальная почта и GitHub, без фейковых форм) -->
-        <section id="contact-section" class="section">
-            <div class="section-header">
-                <h2>📩 Связаться со мной</h2>
-                <p>Всегда открыт для общения и сотрудничества</p>
-            </div>
-            <div class="contact-card">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <span class="contact-icon">📧</span>
-                        <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a>
-                    </div>
-                    <div class="contact-item">
-                        <span class="contact-icon">🐙</span>
-                        <a href="https://github.com/MigunovIvan" target="_blank" rel="noopener">GitHub / MigunovIvan</a>
-                    </div>
+        <!-- Гостевая книга (комментарии из Firebase) -->
+        <section id="comments-section" class="section">
+            <div class="section-header"><h2>💬 Гостевая книга</h2><p>Оставьте свой след</p></div>
+            <div class="comments-wrapper">
+                <div id="comments-list" class="comments-list"></div>
+                <div class="comment-form">
+                    <h3>Написать сообщение</h3>
+                    <input type="text" id="comment-name" placeholder="Ваше имя" maxlength="50">
+                    <textarea id="comment-text" rows="3" placeholder="Текст сообщения..."></textarea>
+                    <button id="submit-comment">Отправить</button>
                 </div>
+            </div>
+        </section>
+
+        <!-- Контакты с формой, которая сохраняет в Firestore -->
+        <section id="contact-section" class="section">
+            <div class="section-header"><h2>📩 Связаться со мной</h2><p>Заполните форму — я получу ваше сообщение в Firebase</p></div>
+            <div class="contact-card">
+                <form id="contact-form">
+                    <div class="form-group"><label>Имя</label><input type="text" id="contact-name" required></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="contact-email" required></div>
+                    <div class="form-group"><label>Сообщение</label><textarea id="contact-message" rows="4" required></textarea></div>
+                    <button type="submit">📨 Отправить</button>
+                    <div id="form-feedback" class="form-feedback"></div>
+                </form>
                 <div class="contact-note">
-                    <p>✉️ Напишите мне на почту — отвечу в течение дня.<br>
-                    🔗 Все мои открытые проекты доступны на GitHub.</p>
+                    <p>✉️ Или напишите напрямую: <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a><br>
+                    🔗 <a href="https://github.com/MigunovIvan" target="_blank">GitHub</a></p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer>
-        <p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></p>
-    </footer>
+    <footer><p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></p></footer>
 
+    <!-- Firebase SDK и модуль инициализации -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+    apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
+    authDomain: "github-9265f.firebaseapp.com",
+    projectId: "github-9265f",
+    storageBucket: "github-9265f.firebasestorage.app",
+    messagingSenderId: "138004786867",
+    appId: "1:138004786867:web:17ccf153d214ce63ca4ac6",
+    measurementId: "G-S4P0FJPYCC"
+  };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.orderBy = orderBy;
+        window.query = query;
+        window.serverTimestamp = serverTimestamp;
+    </script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
