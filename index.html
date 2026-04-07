@@ -8,85 +8,85 @@
 </head>
 <body>
 
-    <header>
-        <div class="header-inner">
-            <div class="avatar">
-                <img src="images/profile.jpg" alt="Ivan Migunov" id="profile-photo">
-                <div>
-                    <h1>Иван Мигунов</h1>
-                    <p>frontend & pet‑проекты</p>
-                </div>
+<header>
+    <div class="header-inner">
+        <div class="avatar">
+            <img src="images/profile.jpg" alt="Ivan Migunov" id="profile-photo">
+            <div>
+                <h1>Иван Мигунов</h1>
+                <p>frontend & pet‑проекты</p>
             </div>
-            <button id="toggle-theme" class="theme-switch" aria-label="Тёмная тема">🌙</button>
         </div>
-    </header>
+        <button id="toggle-theme" class="theme-switch" aria-label="Тёмная тема">🌙</button>
+    </div>
+</header>
 
-    <nav class="main-nav">
-        <button class="nav-btn active" data-section="projects">📂 Проекты</button>
-        <button class="nav-btn" data-section="news">📰 Новости</button>
-        <button class="nav-btn" data-section="comments">💬 Гостевая книга</button>
-        <button class="nav-btn" data-section="contact">📩 Контакты</button>
-    </nav>
+<nav class="main-nav">
+    <button class="nav-btn active" data-section="projects">📂 Проекты</button>
+    <button class="nav-btn" data-section="news">📰 Новости</button>
+    <button class="nav-btn" data-section="comments">💬 Гостевая книга</button>
+    <button class="nav-btn" data-section="contact">📩 Контакты</button>
+</nav>
 
-    <main>
-        <!-- Проекты (без изменений) -->
-        <section id="projects-section" class="section active">
-            <div class="toolbar">
-                <div class="search-box"><span>🔍</span><input type="text" id="search" placeholder="Название или описание..."></div>
-                <div class="sort-box"><label>📋 Сортировать:</label><select id="sort"><option value="name">по имени</option><option value="stars">⭐ по звёздам</option><option value="updated">🕒 по обновлению</option></select></div>
-                <div class="counter" id="counter">проектов: <span>0</span></div>
+<main>
+    <!-- Проекты -->
+    <section id="projects-section" class="section active">
+        <div class="toolbar">
+            <div class="search-box"><span>🔍</span><input type="text" id="search" placeholder="Название или описание..."></div>
+            <div class="sort-box"><label>📋 Сортировать:</label><select id="sort"><option value="name">по имени</option><option value="stars">⭐ по звёздам</option><option value="updated">🕒 по обновлению</option></select></div>
+            <div class="counter" id="counter">проектов: <span>0</span></div>
+        </div>
+        <div id="projects-grid" class="projects-grid"></div>
+        <div id="error-message" class="error-message" style="display: none;">⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button></div>
+    </section>
+
+    <!-- Новости (ручные + автоматические из README) -->
+    <section id="news-section" class="section">
+        <div class="section-header"><h2>📰 Лента новостей</h2><p>Актуальные обновления проектов и анонсы</p></div>
+        <div id="news-container" class="news-grid"></div>
+    </section>
+
+    <!-- Гостевая книга (Firestore) -->
+    <section id="comments-section" class="section">
+        <div class="section-header"><h2>💬 Гостевая книга</h2><p>Оставьте свой след</p></div>
+        <div class="comments-wrapper">
+            <div id="comments-list" class="comments-list"></div>
+            <div class="comment-form">
+                <h3>Написать сообщение</h3>
+                <input type="text" id="comment-name" placeholder="Ваше имя" maxlength="50">
+                <textarea id="comment-text" rows="3" placeholder="Текст сообщения..."></textarea>
+                <button id="submit-comment">Отправить</button>
             </div>
-            <div id="projects-grid" class="projects-grid"></div>
-            <div id="error-message" class="error-message" style="display: none;">⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button></div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Новости (из Firestore) -->
-        <section id="news-section" class="section">
-            <div class="section-header"><h2>📰 Лента новостей</h2><p>Актуальные обновления</p></div>
-            <div id="news-container" class="news-grid"></div>
-        </section>
-
-        <!-- Гостевая книга (комментарии из Firebase) -->
-        <section id="comments-section" class="section">
-            <div class="section-header"><h2>💬 Гостевая книга</h2><p>Оставьте свой след</p></div>
-            <div class="comments-wrapper">
-                <div id="comments-list" class="comments-list"></div>
-                <div class="comment-form">
-                    <h3>Написать сообщение</h3>
-                    <input type="text" id="comment-name" placeholder="Ваше имя" maxlength="50">
-                    <textarea id="comment-text" rows="3" placeholder="Текст сообщения..."></textarea>
-                    <button id="submit-comment">Отправить</button>
-                </div>
+    <!-- Контакты (форма пишет в Firestore) -->
+    <section id="contact-section" class="section">
+        <div class="section-header"><h2>📩 Связаться со мной</h2><p>Заполните форму — я получу ваше сообщение</p></div>
+        <div class="contact-card">
+            <form id="contact-form">
+                <div class="form-group"><label>Имя</label><input type="text" id="contact-name" required></div>
+                <div class="form-group"><label>Email</label><input type="email" id="contact-email" required></div>
+                <div class="form-group"><label>Сообщение</label><textarea id="contact-message" rows="4" required></textarea></div>
+                <button type="submit">📨 Отправить</button>
+                <div id="form-feedback" class="form-feedback"></div>
+            </form>
+            <div class="contact-note">
+                <p>✉️ Или напишите напрямую: <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a><br>
+                🔗 <a href="https://github.com/MigunovIvan" target="_blank">GitHub</a></p>
             </div>
-        </section>
+        </div>
+    </section>
+</main>
 
-        <!-- Контакты с формой, которая сохраняет в Firestore -->
-        <section id="contact-section" class="section">
-            <div class="section-header"><h2>📩 Связаться со мной</h2><p>Заполните форму — я получу ваше сообщение в Firebase</p></div>
-            <div class="contact-card">
-                <form id="contact-form">
-                    <div class="form-group"><label>Имя</label><input type="text" id="contact-name" required></div>
-                    <div class="form-group"><label>Email</label><input type="email" id="contact-email" required></div>
-                    <div class="form-group"><label>Сообщение</label><textarea id="contact-message" rows="4" required></textarea></div>
-                    <button type="submit">📨 Отправить</button>
-                    <div id="form-feedback" class="form-feedback"></div>
-                </form>
-                <div class="contact-note">
-                    <p>✉️ Или напишите напрямую: <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a><br>
-                    🔗 <a href="https://github.com/MigunovIvan" target="_blank">GitHub</a></p>
-                </div>
-            </div>
-        </section>
-    </main>
+<footer><p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></p></footer>
 
-    <footer><p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></p></footer>
+<!-- Firebase SDK (замените конфиг на свой) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    <!-- Firebase SDK и модуль инициализации -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-        const firebaseConfig = {
+    const firebaseConfig = {
     apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
     authDomain: "github-9265f.firebaseapp.com",
     projectId: "github-9265f",
@@ -95,18 +95,17 @@
     appId: "1:138004786867:web:17ccf153d214ce63ca4ac6",
     measurementId: "G-S4P0FJPYCC"
   };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.db = db;
-        window.collection = collection;
-        window.addDoc = addDoc;
-        window.getDocs = getDocs;
-        window.orderBy = orderBy;
-        window.query = query;
-        window.serverTimestamp = serverTimestamp;
-    </script>
-    <script type="module" src="script.js"></script>
+    window.db = db;
+    window.collection = collection;
+    window.addDoc = addDoc;
+    window.getDocs = getDocs;
+    window.orderBy = orderBy;
+    window.query = query;
+    window.serverTimestamp = serverTimestamp;
+</script>
+<script type="module" src="script.js"></script>
 </body>
 </html>

@@ -26,18 +26,17 @@ themeBtn.addEventListener('click', () => {
 });
 loadTheme();
 
-// ========== 2. НАВИГАЦИЯ МЕЖДУ СЕКЦИЯМИ ==========
+// ========== 2. НАВИГАЦИЯ ==========
 const navBtns = document.querySelectorAll('.nav-btn');
 const sections = document.querySelectorAll('.section');
 
 function switchSection(sectionId) {
-    sections.forEach(section => section.classList.remove('active'));
+    sections.forEach(s => s.classList.remove('active'));
     document.getElementById(`${sectionId}-section`).classList.add('active');
     navBtns.forEach(btn => {
         btn.classList.remove('active');
         if (btn.dataset.section === sectionId) btn.classList.add('active');
     });
-    // Если переключились на комментарии — подгружаем их
     if (sectionId === 'comments') loadComments();
 }
 
@@ -45,7 +44,7 @@ navBtns.forEach(btn => {
     btn.addEventListener('click', () => switchSection(btn.dataset.section));
 });
 
-// ========== 3. ПРОЕКТЫ (GitHub API) ==========
+// ========== 3. ПРОЕКТЫ (GITHUB API) ==========
 const projectsGrid = document.getElementById('projects-grid');
 const searchInput = document.getElementById('search');
 const sortSelect = document.getElementById('sort');
@@ -58,12 +57,12 @@ const GITHUB_USER = 'MigunovIvan';
 
 function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
+    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function createCard(project) {
@@ -73,14 +72,14 @@ function createCard(project) {
     img.className = 'project-img';
     img.src = `images/${project.name}.png`;
     img.alt = project.name;
-    img.onerror = function() {
-        const fallbackDiv = document.createElement('div');
-        fallbackDiv.className = 'img-fallback';
-        fallbackDiv.innerHTML = `📁 ${escapeHtml(project.name.slice(0, 20))}`;
-        img.replaceWith(fallbackDiv);
+    img.onerror = () => {
+        const fallback = document.createElement('div');
+        fallback.className = 'img-fallback';
+        fallback.innerHTML = `📁 ${escapeHtml(project.name.slice(0, 20))}`;
+        img.replaceWith(fallback);
     };
     const stars = project.stargazers_count || 0;
-    const updated = new Date(project.updated_at).toLocaleDateString('ru-RU');
+    const updated = formatDate(project.updated_at);
     const body = document.createElement('div');
     body.className = 'card-body';
     body.innerHTML = `
@@ -105,13 +104,10 @@ function renderProjects() {
         (p.description && p.description.toLowerCase().includes(query))
     );
     const sortType = sortSelect.value;
-    if (sortType === 'stars') {
-        filtered.sort((a, b) => b.stargazers_count - a.stargazers_count);
-    } else if (sortType === 'updated') {
-        filtered.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-    } else {
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-    }
+    if (sortType === 'stars') filtered.sort((a,b) => b.stargazers_count - a.stargazers_count);
+    else if (sortType === 'updated') filtered.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+    else filtered.sort((a,b) => a.name.localeCompare(b.name));
+
     counterSpan.textContent = filtered.length;
     projectsGrid.innerHTML = '';
     if (filtered.length === 0) {
@@ -162,37 +158,121 @@ if (searchInput) searchInput.addEventListener('input', renderProjects);
 if (sortSelect) sortSelect.addEventListener('change', renderProjects);
 if (retryBtn) retryBtn.addEventListener('click', loadProjects);
 
-// ========== 4. НОВОСТИ (Firestore) ==========
+// ========== 4. НОВОСТИ (РУЧНЫЕ + АВТОМАТИЧЕСКИЕ ИЗ README) ==========
+// Кэш README в localStorage (1 час)
+async function fetchReadmeForRepo(repoName, repoUpdatedAt) {
+    const cacheKey = `readme_${repoName}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+        try {
+            const { data, timestamp, updatedAt } = JSON.parse(cached);
+            if (updatedAt === repoUpdatedAt && (Date.now() - timestamp) < 60 * 60 * 1000) {
+                return data;
+            }
+        } catch(e) {}
+    }
+    try {
+        const url = `https://api.github.com/repos/${GITHUB_USER}/${repoName}/readme`;
+        const res = await fetch(url, { headers: { 'Accept': 'application/vnd.github.v3.raw' } });
+        if (!res.ok) return null;
+        let text = await res.text();
+        // Очищаем от markdown и обрезаем до 200 символов
+        let plain = text.replace(/[#*`_\[\]()]/g, '').trim();
+        plain = plain.length > 200 ? plain.slice(0, 200) + '…' : plain;
+        const data = { text: plain, repoName, updatedAt: repoUpdatedAt };
+        localStorage.setItem(cacheKey, JSON.stringify({
+            data: data,
+            timestamp: Date.now(),
+            updatedAt: repoUpdatedAt
+        }));
+        return data;
+    } catch (err) {
+        console.warn(`README для ${repoName} не загружен`, err);
+        return null;
+    }
+}
+
 async function loadNews() {
     const newsContainer = document.getElementById('news-container');
     if (!newsContainer) return;
     newsContainer.innerHTML = '<div class="news-card">📡 Загрузка новостей...</div>';
+    
+    let allNewsItems = [];
+
+    // 1. Ручные новости из Firestore
     try {
         const q = query(collection(window.db, 'news'), orderBy('date', 'desc'));
         const snapshot = await getDocs(q);
-        if (snapshot.empty) {
-            newsContainer.innerHTML = '<div class="news-card">Новостей пока нет. Добавьте через консоль Firebase.</div>';
-            return;
-        }
-        newsContainer.innerHTML = '';
         snapshot.forEach(doc => {
-            const news = doc.data();
-            const card = document.createElement('div');
-            card.className = 'news-card';
-            card.innerHTML = `
-                <div class="news-title">${escapeHtml(news.title)}</div>
-                <div class="news-date">📅 ${news.date || 'без даты'}</div>
-                <div class="news-content">${escapeHtml(news.content)}</div>
-            `;
-            newsContainer.appendChild(card);
+            const n = doc.data();
+            allNewsItems.push({
+                type: 'manual',
+                title: n.title,
+                date: n.date,
+                content: n.content,
+                url: null
+            });
         });
     } catch (err) {
-        console.error('Ошибка загрузки новостей:', err);
-        newsContainer.innerHTML = '<div class="news-card">⚠️ Не удалось загрузить новости</div>';
+        console.error('Ошибка загрузки ручных новостей:', err);
+    }
+
+    // 2. Автоматические новости из README проектов
+    if (allProjects.length === 0) {
+        // ждём максимум 2 секунды
+        await new Promise(resolve => {
+            let check = setInterval(() => {
+                if (allProjects.length > 0) { clearInterval(check); resolve(); }
+            }, 200);
+            setTimeout(() => resolve(), 2000);
+        });
+    }
+    const readmePromises = allProjects.map(async (project) => {
+        const readme = await fetchReadmeForRepo(project.name, project.updated_at);
+        if (!readme) return null;
+        return {
+            type: 'project',
+            title: `📁 ${project.name}`,
+            date: project.updated_at.slice(0,10),
+            content: readme.text,
+            url: project.html_url,
+            projectName: project.name
+        };
+    });
+    const projectNews = (await Promise.all(readmePromises)).filter(item => item !== null);
+    allNewsItems.push(...projectNews);
+
+    // 3. Сортировка по дате (новые сверху)
+    allNewsItems.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    if (allNewsItems.length === 0) {
+        newsContainer.innerHTML = '<div class="news-card">Новостей пока нет. Добавьте через Firebase или дождитесь проектов с README.</div>';
+        return;
+    }
+
+    newsContainer.innerHTML = '';
+    for (const item of allNewsItems) {
+        const card = document.createElement('div');
+        card.className = 'news-card';
+        if (item.type === 'manual') {
+            card.innerHTML = `
+                <div class="news-title">📰 ${escapeHtml(item.title)}</div>
+                <div class="news-date">📅 ${formatDate(item.date)}</div>
+                <div class="news-content">${escapeHtml(item.content)}</div>
+            `;
+        } else {
+            card.innerHTML = `
+                <div class="news-title">${escapeHtml(item.title)}</div>
+                <div class="news-date">🕒 Обновлён: ${formatDate(item.date)}</div>
+                <div class="news-content">${escapeHtml(item.content)}</div>
+                <a href="${item.url}" target="_blank" class="project-link">🔗 Подробнее на GitHub</a>
+            `;
+        }
+        newsContainer.appendChild(card);
     }
 }
 
-// ========== 5. ГОСТЕВАЯ КНИГА (Firestore) ==========
+// ========== 5. ГОСТЕВАЯ КНИГА (FIRESTORE) ==========
 async function loadComments() {
     const commentsList = document.getElementById('comments-list');
     if (!commentsList) return;
@@ -207,12 +287,10 @@ async function loadComments() {
         commentsList.innerHTML = '';
         snapshot.forEach(doc => {
             const c = doc.data();
+            let dateStr = 'только что';
+            if (c.timestamp && c.timestamp.toDate) dateStr = c.timestamp.toDate().toLocaleString();
             const div = document.createElement('div');
             div.className = 'comment-item';
-            let dateStr = 'только что';
-            if (c.timestamp && c.timestamp.toDate) {
-                dateStr = c.timestamp.toDate().toLocaleString();
-            }
             div.innerHTML = `
                 <div class="comment-author">✍️ ${escapeHtml(c.name)}</div>
                 <div class="comment-date">🕒 ${dateStr}</div>
@@ -221,16 +299,13 @@ async function loadComments() {
             commentsList.appendChild(div);
         });
     } catch (err) {
-        console.error('Ошибка загрузки комментариев:', err);
+        console.error(err);
         commentsList.innerHTML = '<div class="comment-item">❌ Ошибка загрузки</div>';
     }
 }
 
 async function addComment(name, text) {
-    if (!name.trim() || !text.trim()) {
-        alert("Заполните имя и текст!");
-        return false;
-    }
+    if (!name.trim() || !text.trim()) { alert("Заполните имя и текст!"); return false; }
     try {
         await addDoc(collection(window.db, 'comments'), {
             name: name.trim(),
@@ -239,8 +314,8 @@ async function addComment(name, text) {
         });
         return true;
     } catch (err) {
-        console.error('Ошибка добавления комментария:', err);
-        alert("Не удалось отправить комментарий. Попробуйте позже.");
+        console.error(err);
+        alert("Не удалось отправить комментарий.");
         return false;
     }
 }
@@ -248,21 +323,20 @@ async function addComment(name, text) {
 const submitCommentBtn = document.getElementById('submit-comment');
 if (submitCommentBtn) {
     submitCommentBtn.addEventListener('click', async () => {
-        const nameInput = document.getElementById('comment-name');
-        const textInput = document.getElementById('comment-text');
-        const ok = await addComment(nameInput.value, textInput.value);
+        const name = document.getElementById('comment-name').value;
+        const text = document.getElementById('comment-text').value;
+        const ok = await addComment(name, text);
         if (ok) {
-            nameInput.value = '';
-            textInput.value = '';
+            document.getElementById('comment-name').value = '';
+            document.getElementById('comment-text').value = '';
             loadComments();
         }
     });
 }
 
-// ========== 6. ФОРМА ОБРАТНОЙ СВЯЗИ (Firestore) ==========
+// ========== 6. ФОРМА СВЯЗИ (FIRESTORE) ==========
 const contactForm = document.getElementById('contact-form');
 const formFeedback = document.getElementById('form-feedback');
-
 if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -280,9 +354,7 @@ if (contactForm) {
         formFeedback.innerHTML = '<span style="color:#0066cc;">Отправка...</span>';
         try {
             await addDoc(collection(window.db, 'messages'), {
-                name: name,
-                email: email,
-                message: message,
+                name, email, message,
                 timestamp: serverTimestamp(),
                 read: false
             });
@@ -290,18 +362,16 @@ if (contactForm) {
             contactForm.reset();
             setTimeout(() => formFeedback.innerHTML = '', 5000);
         } catch (err) {
-            console.error('Ошибка отправки формы:', err);
-            formFeedback.innerHTML = '<span style="color:red;">❌ Ошибка сервера. Попробуйте позже.</span>';
+            console.error(err);
+            formFeedback.innerHTML = '<span style="color:red;">❌ Ошибка, попробуйте позже.</span>';
         }
     });
 }
 
-// ========== 7. СТАРТ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ ==========
+// ========== 7. СТАРТ ==========
 window.addEventListener('DOMContentLoaded', () => {
     loadProjects();
     loadNews();
-    // Загружаем комментарии только если секция активна? Нет, loadComments вызовется при первом переключении.
-    // Но можно сразу вызвать, чтобы данные были готовы.
-    loadComments();
-    switchSection('projects'); // показываем проекты по умолчанию
+    loadComments();  // предзагрузим, но отобразится при переключении
+    switchSection('projects');
 });
