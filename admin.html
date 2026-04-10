@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #f4f6fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 28px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 1rem;
+        }
+        button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+        button:hover {
+            background: #333;
+        }
+        .error {
+            color: red;
+            margin-bottom: 16px;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .admin-header h1 {
+            font-size: 1.8rem;
+        }
+        .logout-btn {
+            background: #dc2626;
+            width: auto;
+            padding: 8px 20px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+        .tab {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 40px;
+            color: #555;
+            width: auto;
+        }
+        .tab.active {
+            background: #000;
+            color: white;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e4e4e7;
+        }
+        .message-item, .comment-item, .news-item {
+            border-bottom: 1px solid #eee;
+            padding: 16px 0;
+        }
+        .message-item:last-child, .comment-item:last-child, .news-item:last-child {
+            border-bottom: none;
+        }
+        .message-header, .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .badge {
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        .unread {
+            background: #dc2626;
+            color: white;
+        }
+        button.small {
+            width: auto;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid #ddd;
+        }
+        .news-form {
+            background: #f9f9fc;
+            padding: 20px;
+            border-radius: 24px;
+            margin-bottom: 30px;
+        }
+        hr {
+            margin: 20px 0;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        @media (max-width: 700px) {
+            body { padding: 12px; }
+            .tabs { flex-wrap: wrap; }
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+        const firebaseConfig = {
+    apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
+    authDomain: "github-9265f.firebaseapp.com",
+    projectId: "github-9265f",
+    storageBucket: "github-9265f.firebasestorage.app",
+    messagingSenderId: "138004786867",
+    appId: "1:138004786867:web:17ccf153d214ce63ca4ac6",
+    measurementId: "G-S4P0FJPYCC"
+  };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        window.db = db;
+        window.auth = auth;
+        window.collection = collection;
+        window.getDocs = getDocs;
+        window.addDoc = addDoc;
+        window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.orderBy = orderBy;
+        window.query = query;
+        window.serverTimestamp = serverTimestamp;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+    </script>
+    <script type="module" src="admin.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="login-view" style="display: none;">
+            <div class="login-container">
+                <h2>Вход в админ-панель</h2>
+                <div id="login-error" class="error"></div>
+                <input type="email" id="login-email" placeholder="Email" autocomplete="email">
+                <input type="password" id="login-password" placeholder="Пароль">
+                <button id="login-btn">Войти</button>
+            </div>
+        </div>
+
+        <div id="admin-view" style="display: none;">
+            <div class="admin-header">
+                <h1>🔐 Админ-панель</h1>
+                <button id="logout-btn" class="logout-btn">Выйти</button>
+            </div>
+            <div class="tabs">
+                <button class="tab active" data-tab="messages">📨 Сообщения</button>
+                <button class="tab" data-tab="comments">💬 Комментарии</button>
+                <button class="tab" data-tab="news">📰 Новости</button>
+            </div>
+
+            <!-- Вкладка Сообщения -->
+            <div id="messages-section" class="section active">
+                <div class="card">
+                    <h3>Сообщения из формы связи</h3>
+                    <div id="messages-list"></div>
+                </div>
+            </div>
+
+            <!-- Вкладка Комментарии -->
+            <div id="comments-section" class="section">
+                <div class="card">
+                    <h3>Комментарии (гостевая книга)</h3>
+                    <div id="comments-list"></div>
+                </div>
+            </div>
+
+            <!-- Вкладка Новости -->
+            <div id="news-section" class="section">
+                <div class="news-form">
+                    <h3>➕ Добавить новость</h3>
+                    <div class="form-group">
+                        <label>Заголовок</label>
+                        <input type="text" id="news-title" placeholder="Заголовок">
+                    </div>
+                    <div class="form-group">
+                        <label>Дата (YYYY-MM-DD)</label>
+                        <input type="text" id="news-date" placeholder="2025-04-10">
+                    </div>
+                    <div class="form-group">
+                        <label>Текст новости</label>
+                        <textarea id="news-content" rows="3" placeholder="Содержание..."></textarea>
+                    </div>
+                    <button id="create-news-btn">➕ Создать новость</button>
+                </div>
+                <div class="card">
+                    <h3>📰 Существующие новости</h3>
+                    <div id="news-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
