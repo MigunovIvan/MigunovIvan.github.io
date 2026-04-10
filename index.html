@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Иван Мигунов · Портфолио + Админка</title>
     <style>
-        /* ========== ОСНОВНЫЕ СТИЛИ ========== */
+        /* ========== ОСНОВНЫЕ СТИЛИ (сокращены, но полны) ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
@@ -287,7 +287,7 @@
         footer { text-align: center; padding: 32px; border-top: 1px solid #e4e4e7; margin-top: 40px; color: #6c757d; }
         @media (max-width: 700px) { body { padding: 0 12px; } .toolbar { flex-direction: column; align-items: stretch; border-radius: 32px; } .main-nav { justify-content: center; } }
 
-        /* ========== АДМИН-ПАНЕЛЬ (ВСТРОЕННАЯ) ========== */
+        /* ========== СТИЛИ АДМИНКИ ========== */
         .admin-panel {
             margin-top: 60px;
             border-top: 2px solid #e4e4e7;
@@ -412,7 +412,6 @@
 </nav>
 
 <main>
-    <!-- Проекты -->
     <section id="projects-section" class="section active">
         <div class="toolbar">
             <div class="search-box"><span>🔍</span><input type="text" id="search" placeholder="Название или описание..."></div>
@@ -423,13 +422,11 @@
         <div id="error-message" class="error-message" style="display: none;">⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button></div>
     </section>
 
-    <!-- Новости -->
     <section id="news-section" class="section">
         <div class="section-header"><h2>📰 Лента новостей</h2><p>Актуальные обновления проектов и анонсы</p></div>
         <div id="news-container" class="news-grid"></div>
     </section>
 
-    <!-- Гостевая книга -->
     <section id="comments-section" class="section">
         <div class="section-header"><h2>💬 Гостевая книга</h2><p>Оставьте свой след</p></div>
         <div class="comments-wrapper">
@@ -443,7 +440,6 @@
         </div>
     </section>
 
-    <!-- Контакты -->
     <section id="contact-section" class="section">
         <div class="section-header"><h2>📩 Связаться со мной</h2><p>Заполните форму — я получу ваше сообщение</p></div>
         <div class="contact-card">
@@ -469,7 +465,6 @@
     </div>
 </footer>
 
-<!-- Админ-панель (скрыта по умолчанию) -->
 <div id="admin-panel" style="display: none;">
     <div class="admin-panel container" style="max-width:1200px; margin:0 auto;">
         <div id="admin-login-area">
@@ -489,16 +484,10 @@
                 <button id="admin-logout-btn">🚪 Выйти</button>
             </div>
             <div id="admin-messages-section" class="admin-section">
-                <div class="admin-card">
-                    <h3>Сообщения из формы</h3>
-                    <div id="admin-messages-list"></div>
-                </div>
+                <div class="admin-card"><h3>Сообщения из формы</h3><div id="admin-messages-list"></div></div>
             </div>
             <div id="admin-comments-section" class="admin-section">
-                <div class="admin-card">
-                    <h3>Комментарии гостевой книги</h3>
-                    <div id="admin-comments-list"></div>
-                </div>
+                <div class="admin-card"><h3>Комментарии гостевой книги</h3><div id="admin-comments-list"></div></div>
             </div>
             <div id="admin-news-section" class="admin-section">
                 <div class="news-form">
@@ -508,22 +497,18 @@
                     <textarea id="admin-news-content" rows="3" placeholder="Текст новости..."></textarea>
                     <button id="admin-create-news">Создать</button>
                 </div>
-                <div class="admin-card">
-                    <h3>Существующие новости</h3>
-                    <div id="admin-news-list"></div>
-                </div>
+                <div class="admin-card"><h3>Существующие новости</h3><div id="admin-news-list"></div></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Firebase SDK + основной скрипт (полный, без обрезки) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // 🔧 ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ ИЗ КОНСОЛИ FIREBASE 🔧
+    // 🔥 ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ ИЗ КОНСОЛИ FIREBASE 🔥
     const firebaseConfig = {
     apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
     authDomain: "github-9265f.firebaseapp.com",
@@ -537,7 +522,7 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // ---------- 1. ТЁМНАЯ ТЕМА ----------
+    // ---------- ТЁМНАЯ ТЕМА ----------
     const themeBtn = document.getElementById('toggle-theme');
     function loadTheme() {
         const saved = localStorage.getItem('theme');
@@ -563,7 +548,7 @@
     });
     loadTheme();
 
-    // ---------- 2. НАВИГАЦИЯ ----------
+    // ---------- НАВИГАЦИЯ С АВТОЗАГРУЗКОЙ НОВОСТЕЙ ----------
     const navBtns = document.querySelectorAll('.nav-btn');
     const sections = document.querySelectorAll('.section');
     function switchSection(sectionId) {
@@ -574,10 +559,11 @@
             if (btn.dataset.section === sectionId) btn.classList.add('active');
         });
         if (sectionId === 'comments') loadComments();
+        if (sectionId === 'news') loadNews();  // <-- ДОБАВЛЕНО
     }
     navBtns.forEach(btn => btn.addEventListener('click', () => switchSection(btn.dataset.section)));
 
-    // ---------- 3. ПРОЕКТЫ (GITHUB) ----------
+    // ---------- ПРОЕКТЫ (GITHUB) ----------
     const projectsGrid = document.getElementById('projects-grid');
     const searchInput = document.getElementById('search');
     const sortSelect = document.getElementById('sort');
@@ -666,7 +652,7 @@
     sortSelect?.addEventListener('change', renderProjects);
     retryBtn?.addEventListener('click', loadProjects);
 
-    // ---------- 4. НОВОСТИ (FIREBASE + README) ----------
+    // ---------- НОВОСТИ (FIREBASE + README) ----------
     async function fetchReadmeForRepo(repoName, repoUpdatedAt) {
         const cacheKey = `readme_${repoName}`;
         const cached = localStorage.getItem(cacheKey);
@@ -733,7 +719,7 @@
         }
     }
 
-    // ---------- 5. ГОСТЕВАЯ КНИГА ----------
+    // ---------- ГОСТЕВАЯ КНИГА ----------
     async function loadComments() {
         const container = document.getElementById('comments-list');
         if (!container) return;
@@ -770,7 +756,7 @@
         }
     });
 
-    // ---------- 6. ФОРМА СВЯЗИ ----------
+    // ---------- ФОРМА СВЯЗИ ----------
     const contactForm = document.getElementById('contact-form');
     const formFeedback = document.getElementById('form-feedback');
     contactForm?.addEventListener('submit', async (e) => {
@@ -789,18 +775,14 @@
         } catch(err) { formFeedback.innerHTML = '<span style="color:red;">Ошибка</span>'; }
     });
 
-    // ---------- 7. АДМИН-ПАНЕЛЬ ----------
+    // ---------- АДМИН-ПАНЕЛЬ ----------
     const adminPanel = document.getElementById('admin-panel');
     const adminLoginArea = document.getElementById('admin-login-area');
     const adminContentArea = document.getElementById('admin-content-area');
     const showAdminBtn = document.getElementById('show-admin-login');
 
     showAdminBtn?.addEventListener('click', () => {
-        if (adminPanel.style.display === 'none') {
-            adminPanel.style.display = 'block';
-        } else {
-            adminPanel.style.display = 'none';
-        }
+        adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
     });
 
     document.getElementById('admin-login-btn')?.addEventListener('click', async () => {
@@ -846,7 +828,6 @@
     document.getElementById('admin-comments-tab')?.addEventListener('click', showComments);
     document.getElementById('admin-news-tab')?.addEventListener('click', showNews);
 
-    // Загрузка сообщений для админки
     async function loadAdminMessages() {
         const container = document.getElementById('admin-messages-list');
         if (!container) return;
@@ -890,7 +871,6 @@
         } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; }
     }
 
-    // Загрузка комментариев для админки
     async function loadAdminComments() {
         const container = document.getElementById('admin-comments-list');
         if (!container) return;
@@ -924,7 +904,6 @@
         } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; }
     }
 
-    // Загрузка новостей для админки
     async function loadAdminNews() {
         const container = document.getElementById('admin-news-list');
         if (!container) return;
@@ -952,22 +931,18 @@
                     if (confirm('Удалить новость?')) {
                         await deleteDoc(doc(db, 'news', btn.dataset.id));
                         loadAdminNews();
-                        loadNews(); // обновляем ленту на сайте
+                        loadNews(); // обновляем основную ленту
                     }
                 });
             });
         } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; }
     }
 
-    // Создание новости
     document.getElementById('admin-create-news')?.addEventListener('click', async () => {
         const title = document.getElementById('admin-news-title').value.trim();
         const date = document.getElementById('admin-news-date').value.trim();
         const content = document.getElementById('admin-news-content').value.trim();
-        if (!title || !date || !content) {
-            alert('Заполните все поля');
-            return;
-        }
+        if (!title || !date || !content) { alert('Заполните все поля'); return; }
         try {
             await addDoc(collection(db, 'news'), { title, date, content });
             document.getElementById('admin-news-title').value = '';
@@ -976,9 +951,7 @@
             loadAdminNews();
             loadNews();
             alert('Новость добавлена');
-        } catch(e) {
-            alert('Ошибка добавления');
-        }
+        } catch(e) { alert('Ошибка добавления'); }
     });
 
     // ---------- СТАРТ ----------
