@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Иван Мигунов · Портфолио + Админка</title>
     <style>
-        /* ========== ОСНОВНЫЕ СТИЛИ (сжато, но полностью) ========== */
+        /* ========== ОСНОВНЫЕ СТИЛИ ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
@@ -287,7 +287,7 @@
         footer { text-align: center; padding: 32px; border-top: 1px solid #e4e4e7; margin-top: 40px; color: #6c757d; }
         @media (max-width: 700px) { body { padding: 0 12px; } .toolbar { flex-direction: column; align-items: stretch; border-radius: 32px; } .main-nav { justify-content: center; } }
 
-        /* ========== АДМИН-ПАНЕЛЬ (встроенная) ========== */
+        /* ========== АДМИН-ПАНЕЛЬ (ВСТРОЕННАЯ) ========== */
         .admin-panel {
             margin-top: 60px;
             border-top: 2px solid #e4e4e7;
@@ -517,14 +517,13 @@
     </div>
 </div>
 
-<!-- Firebase SDK + основной скрипт -->
+<!-- Firebase SDK + основной скрипт (полный, без обрезки) -->
 <script type="module">
-    // ========== ИНИЦИАЛИЗАЦИЯ FIREBASE ==========
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // 🔧 ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ ИЗ КОНСОЛИ FIREBASE 🔧
+    // 🔧 ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ ИЗ FIREBASE 🔧
     const firebaseConfig = {
     apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
     authDomain: "github-9265f.firebaseapp.com",
@@ -534,11 +533,12 @@
     appId: "1:138004786867:web:17ccf153d214ce63ca4ac6",
     measurementId: "G-S4P0FJPYCC"
   };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // ========== 1. ТЁМНАЯ ТЕМА ==========
+    // ---------- 1. ТЁМНАЯ ТЕМА ----------
     const themeBtn = document.getElementById('toggle-theme');
     function loadTheme() {
         const saved = localStorage.getItem('theme');
@@ -564,7 +564,7 @@
     });
     loadTheme();
 
-    // ========== 2. НАВИГАЦИЯ ==========
+    // ---------- 2. НАВИГАЦИЯ ----------
     const navBtns = document.querySelectorAll('.nav-btn');
     const sections = document.querySelectorAll('.section');
     function switchSection(sectionId) {
@@ -578,7 +578,7 @@
     }
     navBtns.forEach(btn => btn.addEventListener('click', () => switchSection(btn.dataset.section)));
 
-    // ========== 3. ПРОЕКТЫ (GITHUB) ==========
+    // ---------- 3. ПРОЕКТЫ (GITHUB) ----------
     const projectsGrid = document.getElementById('projects-grid');
     const searchInput = document.getElementById('search');
     const sortSelect = document.getElementById('sort');
@@ -667,7 +667,7 @@
     sortSelect?.addEventListener('change', renderProjects);
     retryBtn?.addEventListener('click', loadProjects);
 
-    // ========== 4. НОВОСТИ (Firestore + README) ==========
+    // ---------- 4. НОВОСТИ (FIREBASE + README) ----------
     async function fetchReadmeForRepo(repoName, repoUpdatedAt) {
         const cacheKey = `readme_${repoName}`;
         const cached = localStorage.getItem(cacheKey);
@@ -694,7 +694,6 @@
         if (!newsContainer) return;
         newsContainer.innerHTML = '<div class="news-card">📡 Загрузка...</div>';
         let allNewsItems = [];
-
         try {
             const q = query(collection(db, 'news'), orderBy('date', 'desc'));
             const snapshot = await getDocs(q);
@@ -705,7 +704,6 @@
                 }
             });
         } catch(e) { console.error(e); }
-
         if (allProjects.length === 0) await new Promise(resolve => setTimeout(resolve, 1500));
         const readmePromises = allProjects.map(async (p) => {
             const readme = await fetchReadmeForRepo(p.name, p.updated_at);
@@ -719,7 +717,6 @@
         const projectNews = (await Promise.all(readmePromises)).filter(i => i);
         allNewsItems.push(...projectNews);
         allNewsItems.sort((a,b) => new Date(b.date) - new Date(a.date));
-
         if (allNewsItems.length === 0) {
             newsContainer.innerHTML = '<div class="news-card">Новостей нет</div>';
             return;
@@ -737,7 +734,7 @@
         }
     }
 
-    // ========== 5. ГОСТЕВАЯ КНИГА ==========
+    // ---------- 5. ГОСТЕВАЯ КНИГА ----------
     async function loadComments() {
         const container = document.getElementById('comments-list');
         if (!container) return;
@@ -774,7 +771,7 @@
         }
     });
 
-    // ========== 6. ФОРМА СВЯЗИ ==========
+    // ---------- 6. ФОРМА СВЯЗИ ----------
     const contactForm = document.getElementById('contact-form');
     const formFeedback = document.getElementById('form-feedback');
     contactForm?.addEventListener('submit', async (e) => {
@@ -793,23 +790,20 @@
         } catch(err) { formFeedback.innerHTML = '<span style="color:red;">Ошибка</span>'; }
     });
 
-    // ========== 7. АДМИН-ПАНЕЛЬ (ПОЛНОСТЬЮ РАБОТАЕТ) ==========
+    // ---------- 7. АДМИН-ПАНЕЛЬ ----------
     const adminPanel = document.getElementById('admin-panel');
     const adminLoginArea = document.getElementById('admin-login-area');
     const adminContentArea = document.getElementById('admin-content-area');
     const showAdminBtn = document.getElementById('show-admin-login');
 
-    // Переключение видимости админ-панели
     showAdminBtn?.addEventListener('click', () => {
         if (adminPanel.style.display === 'none') {
             adminPanel.style.display = 'block';
         } else {
             adminPanel.style.display = 'none';
-            // Если панель скрыли, а пользователь был залогинен — можно оставить как есть, но форма входа покажется снова при следующем открытии
         }
     });
 
-    // Логин
     document.getElementById('admin-login-btn')?.addEventListener('click', async () => {
         const email = document.getElementById('admin-email').value;
         const password = document.getElementById('admin-password').value;
@@ -827,14 +821,12 @@
         }
     });
 
-    // Выход
     document.getElementById('admin-logout-btn')?.addEventListener('click', async () => {
         await signOut(auth);
         adminLoginArea.style.display = 'block';
         adminContentArea.style.display = 'none';
     });
 
-    // Автоматическое восстановление сессии (если админ-панель открыта и пользователь уже залогинен)
     onAuthStateChanged(auth, (user) => {
         if (user && adminPanel.style.display !== 'none') {
             adminLoginArea.style.display = 'none';
@@ -848,7 +840,6 @@
         }
     });
 
-    // Табы админки
     const showMessages = () => { document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active')); document.getElementById('admin-messages-section').classList.add('active'); };
     const showComments = () => { document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active')); document.getElementById('admin-comments-section').classList.add('active'); };
     const showNews = () => { document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active')); document.getElementById('admin-news-section').classList.add('active'); };
@@ -856,7 +847,6 @@
     document.getElementById('admin-comments-tab')?.addEventListener('click', showComments);
     document.getElementById('admin-news-tab')?.addEventListener('click', showNews);
 
-    // Загрузка данных для админки
     async function loadAdminMessages() {
         const container = document.getElementById('admin-messages-list');
         if (!container) return;
@@ -899,6 +889,7 @@
             });
         } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
     }
+
     async function loadAdminComments() {
         const container = document.getElementById('admin-comments-list');
         if (!container) return;
@@ -931,6 +922,7 @@
             });
         } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
     }
+
     async function loadAdminNews() {
         const container = document.getElementById('admin-news-list');
         if (!container) return;
@@ -978,6 +970,7 @@
             });
         } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
     }
+
     document.getElementById('admin-create-news')?.addEventListener('click', async () => {
         const title = document.getElementById('admin-news-title').value.trim();
         const date = document.getElementById('admin-news-date').value.trim();
@@ -992,7 +985,7 @@
         alert('Новость добавлена');
     });
 
-    // ========== ЗАПУСК ==========
+    // ---------- ЗАПУСК ----------
     loadProjects();
     loadNews();
     loadComments();
