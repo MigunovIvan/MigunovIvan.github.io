@@ -3,8 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Иван Мигунов · Портфолио</title>
+    <title>Иван Мигунов · Портфолио + Админка</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Дополнительные стили для админ-панели внутри index.html */
+        .admin-panel {
+            margin-top: 60px;
+            border-top: 2px solid #e4e4e7;
+            padding: 30px 0;
+            background: #f9fafc;
+        }
+        body.dark .admin-panel {
+            background: #111114;
+            border-top-color: #2c2c32;
+        }
+        .admin-toggle {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .admin-login-btn {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .admin-login-form {
+            max-width: 400px;
+            margin: 0 auto 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 28px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        body.dark .admin-login-form {
+            background: #1e1e24;
+        }
+        .admin-login-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+        }
+        .admin-login-form button {
+            width: 100%;
+            background: #000;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .admin-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .admin-controls button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .admin-section {
+            display: none;
+            margin-bottom: 30px;
+        }
+        .admin-section.active {
+            display: block;
+        }
+        .admin-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e4e4e7;
+        }
+        body.dark .admin-card {
+            background: #1a1a1f;
+        }
+        .message-item, .comment-item, .news-item {
+            border-bottom: 1px solid #eee;
+            padding: 16px 0;
+        }
+        .admin-card button.small {
+            background: #000;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+        .admin-card button.delete {
+            background: #dc2626;
+        }
+        .news-form {
+            background: #f9f9fc;
+            padding: 20px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+        }
+        body.dark .news-form {
+            background: #25252b;
+        }
+        .news-form input, .news-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border-radius: 16px;
+            border: 1px solid #ddd;
+        }
+        .badge {
+            background: #eef2ff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .badge.unread {
+            background: #dc2626;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,7 +140,7 @@
                 <p>frontend & pet‑проекты</p>
             </div>
         </div>
-        <button id="toggle-theme" class="theme-switch" aria-label="Тёмная тема">🌙</button>
+        <button id="toggle-theme" class="theme-switch">🌙</button>
     </div>
 </header>
 
@@ -40,13 +163,13 @@
         <div id="error-message" class="error-message" style="display: none;">⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button></div>
     </section>
 
-    <!-- Новости (ручные + автоматические из README) -->
+    <!-- Новости -->
     <section id="news-section" class="section">
         <div class="section-header"><h2>📰 Лента новостей</h2><p>Актуальные обновления проектов и анонсы</p></div>
         <div id="news-container" class="news-grid"></div>
     </section>
 
-    <!-- Гостевая книга (Firestore) -->
+    <!-- Гостевая книга -->
     <section id="comments-section" class="section">
         <div class="section-header"><h2>💬 Гостевая книга</h2><p>Оставьте свой след</p></div>
         <div class="comments-wrapper">
@@ -60,7 +183,7 @@
         </div>
     </section>
 
-    <!-- Контакты (форма пишет в Firestore) -->
+    <!-- Контакты -->
     <section id="contact-section" class="section">
         <div class="section-header"><h2>📩 Связаться со мной</h2><p>Заполните форму — я получу ваше сообщение</p></div>
         <div class="contact-card">
@@ -72,19 +195,73 @@
                 <div id="form-feedback" class="form-feedback"></div>
             </form>
             <div class="contact-note">
-                <p>✉️ Или напишите напрямую: <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a><br>
+                <p>✉️ Или напрямую: <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a><br>
                 🔗 <a href="https://github.com/MigunovIvan" target="_blank">GitHub</a></p>
             </div>
         </div>
     </section>
 </main>
 
-<footer><p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></p></footer>
+<footer>
+    <p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></p>
+    <div class="admin-toggle">
+        <button id="show-admin-login" class="admin-login-btn">🔐 Вход для админа</button>
+    </div>
+</footer>
 
-<!-- Firebase SDK (замените конфиг на свой) -->
+<!-- Админ-панель (скрыта по умолчанию) -->
+<div id="admin-panel" style="display: none;">
+    <div class="admin-panel container">
+        <div id="admin-login-area">
+            <div class="admin-login-form">
+                <h3>Вход в админ-панель</h3>
+                <div id="admin-login-error" style="color:red;"></div>
+                <input type="email" id="admin-email" placeholder="Email">
+                <input type="password" id="admin-password" placeholder="Пароль">
+                <button id="admin-login-btn">Войти</button>
+            </div>
+        </div>
+        <div id="admin-content-area" style="display: none;">
+            <div class="admin-controls">
+                <button id="admin-messages-tab">📨 Сообщения</button>
+                <button id="admin-comments-tab">💬 Комментарии</button>
+                <button id="admin-news-tab">📰 Новости</button>
+                <button id="admin-logout-btn">🚪 Выйти</button>
+            </div>
+            <div id="admin-messages-section" class="admin-section">
+                <div class="admin-card">
+                    <h3>Сообщения из формы</h3>
+                    <div id="admin-messages-list"></div>
+                </div>
+            </div>
+            <div id="admin-comments-section" class="admin-section">
+                <div class="admin-card">
+                    <h3>Комментарии гостевой книги</h3>
+                    <div id="admin-comments-list"></div>
+                </div>
+            </div>
+            <div id="admin-news-section" class="admin-section">
+                <div class="news-form">
+                    <h3>➕ Добавить новость</h3>
+                    <input type="text" id="admin-news-title" placeholder="Заголовок">
+                    <input type="text" id="admin-news-date" placeholder="Дата YYYY-MM-DD">
+                    <textarea id="admin-news-content" rows="3" placeholder="Текст новости..."></textarea>
+                    <button id="admin-create-news">Создать</button>
+                </div>
+                <div class="admin-card">
+                    <h3>Существующие новости</h3>
+                    <div id="admin-news-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase SDK -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const firebaseConfig = {
     apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
@@ -97,15 +274,466 @@
   };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
     window.db = db;
+    window.auth = auth;
     window.collection = collection;
     window.addDoc = addDoc;
     window.getDocs = getDocs;
+    window.updateDoc = updateDoc;
+    window.deleteDoc = deleteDoc;
+    window.doc = doc;
     window.orderBy = orderBy;
     window.query = query;
     window.serverTimestamp = serverTimestamp;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.onAuthStateChanged = onAuthStateChanged;
+    window.signOut = signOut;
+
+    // Импортируем основной скрипт (он ниже)
+    import("./script.js").catch(e => console.error("Ошибка загрузки основного скрипта", e));
 </script>
-<script type="module" src="script.js"></script>
+
+<!-- Встроенный скрипт для админки и общего функционала -->
+<script type="module">
+    // ========== 1. ТЁМНАЯ ТЕМА ==========
+    const themeBtn = document.getElementById('toggle-theme');
+    function loadTheme() {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+            document.body.classList.add('dark');
+            themeBtn.textContent = '☀️';
+        } else if (saved === 'light') {
+            document.body.classList.remove('dark');
+            themeBtn.textContent = '🌙';
+        } else {
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark');
+                themeBtn.textContent = '☀️';
+            } else {
+                themeBtn.textContent = '🌙';
+            }
+        }
+    }
+    themeBtn.addEventListener('click', () => {
+        const isDark = document.body.classList.toggle('dark');
+        themeBtn.textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+    loadTheme();
+
+    // ========== 2. НАВИГАЦИЯ ==========
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const sections = document.querySelectorAll('.section');
+    function switchSection(sectionId) {
+        sections.forEach(s => s.classList.remove('active'));
+        document.getElementById(`${sectionId}-section`).classList.add('active');
+        navBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.section === sectionId) btn.classList.add('active');
+        });
+        if (sectionId === 'comments') loadComments();
+    }
+    navBtns.forEach(btn => btn.addEventListener('click', () => switchSection(btn.dataset.section)));
+
+    // ========== 3. ПРОЕКТЫ (GITHUB) ==========
+    const projectsGrid = document.getElementById('projects-grid');
+    const searchInput = document.getElementById('search');
+    const sortSelect = document.getElementById('sort');
+    const counterSpan = document.querySelector('#counter span');
+    const errorMsgDiv = document.getElementById('error-message');
+    const retryBtn = document.getElementById('retry');
+    let allProjects = [];
+    const GITHUB_USER = 'MigunovIvan';
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+    }
+    function formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    function createCard(project) {
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        const img = document.createElement('img');
+        img.className = 'project-img';
+        img.src = `images/${project.name}.png`;
+        img.alt = project.name;
+        img.onerror = () => {
+            const fallback = document.createElement('div');
+            fallback.className = 'img-fallback';
+            fallback.innerHTML = `📁 ${escapeHtml(project.name.slice(0, 20))}`;
+            img.replaceWith(fallback);
+        };
+        const stars = project.stargazers_count || 0;
+        const updated = formatDate(project.updated_at);
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        body.innerHTML = `
+            <div class="project-name">${escapeHtml(project.name)}</div>
+            <div class="project-desc">${escapeHtml(project.description) || '— без описания —'}</div>
+            <div class="project-meta"><span>⭐ ${stars}</span><span>🕒 ${updated}</span><span>💻 ${escapeHtml(project.language) || '—'}</span></div>
+            <a href="${project.html_url}" class="project-link" target="_blank">Открыть на GitHub →</a>
+        `;
+        card.appendChild(img);
+        card.appendChild(body);
+        return card;
+    }
+    function renderProjects() {
+        const query = searchInput.value.trim().toLowerCase();
+        let filtered = allProjects.filter(p => p.name.toLowerCase().includes(query) || (p.description && p.description.toLowerCase().includes(query)));
+        const sortType = sortSelect.value;
+        if (sortType === 'stars') filtered.sort((a,b) => b.stargazers_count - a.stargazers_count);
+        else if (sortType === 'updated') filtered.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+        else filtered.sort((a,b) => a.name.localeCompare(b.name));
+        counterSpan.textContent = filtered.length;
+        projectsGrid.innerHTML = '';
+        if (filtered.length === 0) {
+            projectsGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px;">😕 Нет проектов</div>`;
+            return;
+        }
+        filtered.forEach(p => projectsGrid.appendChild(createCard(p)));
+    }
+    function showSkeletons() {
+        projectsGrid.innerHTML = '';
+        for (let i = 0; i < 6; i++) {
+            const skeleton = document.createElement('div');
+            skeleton.className = 'skeleton';
+            skeleton.innerHTML = `<div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:40%"></div></div>`;
+            projectsGrid.appendChild(skeleton);
+        }
+    }
+    async function loadProjects() {
+        showSkeletons();
+        errorMsgDiv.style.display = 'none';
+        try {
+            const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=100`);
+            if (!res.ok) throw new Error(`Ошибка ${res.status}`);
+            const repos = await res.json();
+            allProjects = repos.filter(r => !r.fork);
+            if (allProjects.length === 0) projectsGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center">📭 Нет репозиториев</div>';
+            else renderProjects();
+        } catch (err) {
+            errorMsgDiv.style.display = 'block';
+            projectsGrid.innerHTML = '';
+        }
+    }
+    searchInput?.addEventListener('input', renderProjects);
+    sortSelect?.addEventListener('change', renderProjects);
+    retryBtn?.addEventListener('click', loadProjects);
+
+    // ========== 4. НОВОСТИ (Firestore + README) ==========
+    async function fetchReadmeForRepo(repoName, repoUpdatedAt) {
+        const cacheKey = `readme_${repoName}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            try {
+                const { data, timestamp, updatedAt } = JSON.parse(cached);
+                if (updatedAt === repoUpdatedAt && (Date.now() - timestamp) < 3600000) return data;
+            } catch(e) {}
+        }
+        try {
+            const url = `https://api.github.com/repos/${GITHUB_USER}/${repoName}/readme`;
+            const res = await fetch(url, { headers: { 'Accept': 'application/vnd.github.v3.raw' } });
+            if (!res.ok) return null;
+            let text = await res.text();
+            let plain = text.replace(/[#*`_\[\]()]/g, '').trim();
+            plain = plain.length > 200 ? plain.slice(0,200)+'…' : plain;
+            const data = { text: plain, repoName, updatedAt: repoUpdatedAt };
+            localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now(), updatedAt: repoUpdatedAt }));
+            return data;
+        } catch(err) { return null; }
+    }
+    async function loadNews() {
+        const newsContainer = document.getElementById('news-container');
+        if (!newsContainer) return;
+        newsContainer.innerHTML = '<div class="news-card">📡 Загрузка...</div>';
+        let allNewsItems = [];
+        try {
+            const q = query(collection(db, 'news'), orderBy('date', 'desc'));
+            const snapshot = await getDocs(q);
+            snapshot.forEach(doc => {
+                const n = doc.data();
+                allNewsItems.push({ type: 'manual', title: n.title, date: n.date, content: n.content, url: null });
+            });
+        } catch(e) { console.error(e); }
+        if (allProjects.length === 0) await new Promise(resolve => setTimeout(resolve, 1500));
+        const readmePromises = allProjects.map(async (p) => {
+            const readme = await fetchReadmeForRepo(p.name, p.updated_at);
+            if (!readme) return null;
+            return { type: 'project', title: `📁 ${p.name}`, date: p.updated_at.slice(0,10), content: readme.text, url: p.html_url };
+        });
+        const projectNews = (await Promise.all(readmePromises)).filter(i => i);
+        allNewsItems.push(...projectNews);
+        allNewsItems.sort((a,b) => new Date(b.date) - new Date(a.date));
+        if (allNewsItems.length === 0) { newsContainer.innerHTML = '<div class="news-card">Новостей нет</div>'; return; }
+        newsContainer.innerHTML = '';
+        for (const item of allNewsItems) {
+            const card = document.createElement('div');
+            card.className = 'news-card';
+            if (item.type === 'manual') {
+                card.innerHTML = `<div class="news-title">📰 ${escapeHtml(item.title)}</div><div class="news-date">📅 ${formatDate(item.date)}</div><div class="news-content">${escapeHtml(item.content)}</div>`;
+            } else {
+                card.innerHTML = `<div class="news-title">${escapeHtml(item.title)}</div><div class="news-date">🕒 Обновлён: ${formatDate(item.date)}</div><div class="news-content">${escapeHtml(item.content)}</div><a href="${item.url}" target="_blank" class="project-link">🔗 Подробнее</a>`;
+            }
+            newsContainer.appendChild(card);
+        }
+    }
+
+    // ========== 5. ГОСТЕВАЯ КНИГА ==========
+    async function loadComments() {
+        const container = document.getElementById('comments-list');
+        if (!container) return;
+        container.innerHTML = '<div class="comment-item">Загрузка...</div>';
+        try {
+            const q = query(collection(db, 'comments'), orderBy('timestamp', 'desc'));
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) { container.innerHTML = '<div class="comment-item">Пока нет комментариев</div>'; return; }
+            container.innerHTML = '';
+            snapshot.forEach(doc => {
+                const c = doc.data();
+                const date = c.timestamp?.toDate().toLocaleString() || 'только что';
+                const div = document.createElement('div');
+                div.className = 'comment-item';
+                div.innerHTML = `<div class="comment-author">✍️ ${escapeHtml(c.name)}</div><div class="comment-date">🕒 ${date}</div><div class="comment-text">${escapeHtml(c.text)}</div>`;
+                container.appendChild(div);
+            });
+        } catch(e) { container.innerHTML = '<div class="comment-item">Ошибка загрузки</div>'; }
+    }
+    async function addComment(name, text) {
+        if (!name.trim() || !text.trim()) { alert("Заполните поля"); return false; }
+        try {
+            await addDoc(collection(db, 'comments'), { name: name.trim(), text: text.trim(), timestamp: serverTimestamp() });
+            return true;
+        } catch(e) { alert("Ошибка"); return false; }
+    }
+    document.getElementById('submit-comment')?.addEventListener('click', async () => {
+        const name = document.getElementById('comment-name').value;
+        const text = document.getElementById('comment-text').value;
+        if (await addComment(name, text)) {
+            document.getElementById('comment-name').value = '';
+            document.getElementById('comment-text').value = '';
+            loadComments();
+        }
+    });
+
+    // ========== 6. ФОРМА СВЯЗИ ==========
+    const contactForm = document.getElementById('contact-form');
+    const formFeedback = document.getElementById('form-feedback');
+    contactForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('contact-name').value.trim();
+        const email = document.getElementById('contact-email').value.trim();
+        const message = document.getElementById('contact-message').value.trim();
+        if (!name || !email || !message) { formFeedback.innerHTML = '<span style="color:red;">Заполните все поля</span>'; return; }
+        if (!email.includes('@')) { formFeedback.innerHTML = '<span style="color:red;">Некорректный email</span>'; return; }
+        formFeedback.innerHTML = '<span style="color:#0066cc;">Отправка...</span>';
+        try {
+            await addDoc(collection(db, 'messages'), { name, email, message, timestamp: serverTimestamp(), read: false });
+            formFeedback.innerHTML = '<span style="color:green;">✅ Сообщение отправлено!</span>';
+            contactForm.reset();
+            setTimeout(() => formFeedback.innerHTML = '', 4000);
+        } catch(err) { formFeedback.innerHTML = '<span style="color:red;">Ошибка</span>'; }
+    });
+
+    // ========== 7. АДМИН-ПАНЕЛЬ (скрытая) ==========
+    const adminPanel = document.getElementById('admin-panel');
+    const adminLoginArea = document.getElementById('admin-login-area');
+    const adminContentArea = document.getElementById('admin-content-area');
+    const showAdminBtn = document.getElementById('show-admin-login');
+    let adminLoggedIn = false;
+
+    showAdminBtn?.addEventListener('click', () => {
+        adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Логин админа
+    document.getElementById('admin-login-btn')?.addEventListener('click', async () => {
+        const email = document.getElementById('admin-email').value;
+        const password = document.getElementById('admin-password').value;
+        const errorDiv = document.getElementById('admin-login-error');
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            errorDiv.textContent = '';
+            adminLoginArea.style.display = 'none';
+            adminContentArea.style.display = 'block';
+            adminLoggedIn = true;
+            loadAdminMessages();
+            loadAdminComments();
+            loadAdminNews();
+        } catch(err) {
+            errorDiv.textContent = 'Неверный email или пароль';
+        }
+    });
+    document.getElementById('admin-logout-btn')?.addEventListener('click', async () => {
+        await signOut(auth);
+        adminLoginArea.style.display = 'block';
+        adminContentArea.style.display = 'none';
+        adminLoggedIn = false;
+    });
+    onAuthStateChanged(auth, (user) => {
+        if (user && adminPanel.style.display !== 'none') {
+            adminLoginArea.style.display = 'none';
+            adminContentArea.style.display = 'block';
+            loadAdminMessages();
+            loadAdminComments();
+            loadAdminNews();
+        } else if (!user && adminPanel.style.display !== 'none') {
+            adminLoginArea.style.display = 'block';
+            adminContentArea.style.display = 'none';
+        }
+    });
+
+    // Табы админки
+    const showMessages = () => { document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active')); document.getElementById('admin-messages-section').classList.add('active'); };
+    const showComments = () => { document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active')); document.getElementById('admin-comments-section').classList.add('active'); };
+    const showNews = () => { document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active')); document.getElementById('admin-news-section').classList.add('active'); };
+    document.getElementById('admin-messages-tab')?.addEventListener('click', showMessages);
+    document.getElementById('admin-comments-tab')?.addEventListener('click', showComments);
+    document.getElementById('admin-news-tab')?.addEventListener('click', showNews);
+
+    async function loadAdminMessages() {
+        const container = document.getElementById('admin-messages-list');
+        if (!container) return;
+        container.innerHTML = '<p>Загрузка...</p>';
+        try {
+            const q = query(collection(db, 'messages'), orderBy('timestamp', 'desc'));
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) { container.innerHTML = '<p>Нет сообщений</p>'; return; }
+            container.innerHTML = '';
+            for (const docSnap of snapshot.docs) {
+                const msg = docSnap.data();
+                const id = docSnap.id;
+                const date = msg.timestamp?.toDate().toLocaleString() || 'без даты';
+                const div = document.createElement('div');
+                div.className = 'message-item';
+                div.innerHTML = `
+                    <div><strong>${escapeHtml(msg.name)}</strong> (${escapeHtml(msg.email)}) <span class="badge ${msg.read ? '' : 'unread'}">${msg.read ? 'Прочитано' : 'Новое'}</span></div>
+                    <div>${escapeHtml(msg.message)}</div>
+                    <div style="font-size:0.75rem; margin-top:5px;">${date}</div>
+                    <div style="margin-top:8px;">
+                        ${!msg.read ? `<button class="small" data-id="${id}" data-action="mark">📖 Отметить прочитанным</button>` : ''}
+                        <button class="small delete" data-id="${id}" data-action="delete">🗑 Удалить</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+            container.querySelectorAll('button[data-action="mark"]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await updateDoc(doc(db, 'messages', btn.dataset.id), { read: true });
+                    loadAdminMessages();
+                });
+            });
+            container.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (confirm('Удалить?')) {
+                        await deleteDoc(doc(db, 'messages', btn.dataset.id));
+                        loadAdminMessages();
+                    }
+                });
+            });
+        } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
+    }
+    async function loadAdminComments() {
+        const container = document.getElementById('admin-comments-list');
+        if (!container) return;
+        container.innerHTML = '<p>Загрузка...</p>';
+        try {
+            const q = query(collection(db, 'comments'), orderBy('timestamp', 'desc'));
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) { container.innerHTML = '<p>Нет комментариев</p>'; return; }
+            container.innerHTML = '';
+            for (const docSnap of snapshot.docs) {
+                const comm = docSnap.data();
+                const id = docSnap.id;
+                const date = comm.timestamp?.toDate().toLocaleString() || 'только что';
+                const div = document.createElement('div');
+                div.className = 'comment-item';
+                div.innerHTML = `
+                    <div><strong>${escapeHtml(comm.name)}</strong> <button class="small delete" data-id="${id}">🗑 Удалить</button></div>
+                    <div>${escapeHtml(comm.text)}</div>
+                    <div style="font-size:0.75rem;">${date}</div>
+                `;
+                container.appendChild(div);
+            }
+            container.querySelectorAll('.delete').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (confirm('Удалить комментарий?')) {
+                        await deleteDoc(doc(db, 'comments', btn.dataset.id));
+                        loadAdminComments();
+                    }
+                });
+            });
+        } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
+    }
+    async function loadAdminNews() {
+        const container = document.getElementById('admin-news-list');
+        if (!container) return;
+        container.innerHTML = '<p>Загрузка...</p>';
+        try {
+            const q = query(collection(db, 'news'), orderBy('date', 'desc'));
+            const snapshot = await getDocs(q);
+            if (snapshot.empty) { container.innerHTML = '<p>Нет новостей</p>'; return; }
+            container.innerHTML = '';
+            for (const docSnap of snapshot.docs) {
+                const n = docSnap.data();
+                const id = docSnap.id;
+                const div = document.createElement('div');
+                div.className = 'news-item';
+                div.innerHTML = `
+                    <div><strong>${escapeHtml(n.title)}</strong> <button class="small edit-news" data-id="${id}" data-title="${escapeHtml(n.title)}" data-date="${n.date}" data-content="${escapeHtml(n.content)}">✏️ Ред.</button> <button class="small delete" data-id="${id}">🗑 Удалить</button></div>
+                    <div>📅 ${n.date}</div>
+                    <div>${escapeHtml(n.content)}</div>
+                `;
+                container.appendChild(div);
+            }
+            container.querySelectorAll('.edit-news').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    const oldTitle = btn.dataset.title;
+                    const oldDate = btn.dataset.date;
+                    const oldContent = btn.dataset.content;
+                    const newTitle = prompt('Новый заголовок', oldTitle);
+                    if (!newTitle) return;
+                    const newDate = prompt('Новая дата (YYYY-MM-DD)', oldDate);
+                    if (!newDate) return;
+                    const newContent = prompt('Новый текст', oldContent);
+                    if (!newContent) return;
+                    updateDoc(doc(db, 'news', id), { title: newTitle, date: newDate, content: newContent }).then(() => loadAdminNews());
+                });
+            });
+            container.querySelectorAll('.delete').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (confirm('Удалить новость?')) {
+                        await deleteDoc(doc(db, 'news', btn.dataset.id));
+                        loadAdminNews();
+                        loadNews(); // обновляем основной блок новостей
+                    }
+                });
+            });
+        } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
+    }
+    document.getElementById('admin-create-news')?.addEventListener('click', async () => {
+        const title = document.getElementById('admin-news-title').value.trim();
+        const date = document.getElementById('admin-news-date').value.trim();
+        const content = document.getElementById('admin-news-content').value.trim();
+        if (!title || !date || !content) { alert('Заполните все поля'); return; }
+        await addDoc(collection(db, 'news'), { title, date, content });
+        document.getElementById('admin-news-title').value = '';
+        document.getElementById('admin-news-date').value = '';
+        document.getElementById('admin-news-content').value = '';
+        loadAdminNews();
+        loadNews();
+        alert('Новость добавлена');
+    });
+
+    // Старт
+    loadProjects();
+    loadNews();
+    loadComments();
+    switchSection('projects');
+</script>
 </body>
 </html>
