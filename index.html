@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Иван Мигунов · Портфолио + Админка</title>
     <style>
-        /* ========== ОСНОВНЫЕ СТИЛИ (сокращены, но полны) ========== */
+        /* ========== ОСНОВНЫЕ СТИЛИ (полные, но сжаты для краткости) ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
@@ -548,7 +548,7 @@
     });
     loadTheme();
 
-    // ---------- НАВИГАЦИЯ С АВТОЗАГРУЗКОЙ НОВОСТЕЙ ----------
+    // ---------- НАВИГАЦИЯ (с автозагрузкой новостей) ----------
     const navBtns = document.querySelectorAll('.nav-btn');
     const sections = document.querySelectorAll('.section');
     function switchSection(sectionId) {
@@ -559,7 +559,7 @@
             if (btn.dataset.section === sectionId) btn.classList.add('active');
         });
         if (sectionId === 'comments') loadComments();
-        if (sectionId === 'news') loadNews();  // <-- ДОБАВЛЕНО
+        if (sectionId === 'news') loadNews();
     }
     navBtns.forEach(btn => btn.addEventListener('click', () => switchSection(btn.dataset.section)));
 
@@ -797,6 +797,8 @@
             loadAdminMessages();
             loadAdminComments();
             loadAdminNews();
+            // Автоматически показать вкладку "Сообщения" после входа
+            showMessages();
         } catch(err) {
             errorDiv.textContent = 'Неверный email или пароль';
         }
@@ -815,6 +817,7 @@
             loadAdminMessages();
             loadAdminComments();
             loadAdminNews();
+            showMessages();
         } else if (!user && adminPanel.style.display !== 'none') {
             adminLoginArea.style.display = 'block';
             adminContentArea.style.display = 'none';
@@ -935,7 +938,9 @@
                     }
                 });
             });
-        } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; }
+        } catch(e) { 
+            container.innerHTML = '<p>Ошибка загрузки</p>';
+        }
     }
 
     document.getElementById('admin-create-news')?.addEventListener('click', async () => {
