@@ -523,7 +523,7 @@
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // 🔧 ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ ИЗ FIREBASE 🔧
+    // 🔧 ЗАМЕНИТЕ НА ВАШИ ДАННЫЕ ИЗ КОНСОЛИ FIREBASE 🔧
     const firebaseConfig = {
     apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
     authDomain: "github-9265f.firebaseapp.com",
@@ -533,7 +533,6 @@
     appId: "1:138004786867:web:17ccf153d214ce63ca4ac6",
     measurementId: "G-S4P0FJPYCC"
   };
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
@@ -847,6 +846,7 @@
     document.getElementById('admin-comments-tab')?.addEventListener('click', showComments);
     document.getElementById('admin-news-tab')?.addEventListener('click', showNews);
 
+    // Загрузка сообщений для админки
     async function loadAdminMessages() {
         const container = document.getElementById('admin-messages-list');
         if (!container) return;
@@ -881,15 +881,16 @@
             });
             container.querySelectorAll('button[data-action="delete"]').forEach(btn => {
                 btn.addEventListener('click', async () => {
-                    if (confirm('Удалить?')) {
+                    if (confirm('Удалить сообщение?')) {
                         await deleteDoc(doc(db, 'messages', btn.dataset.id));
                         loadAdminMessages();
                     }
                 });
             });
-        } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
+        } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; }
     }
 
+    // Загрузка комментариев для админки
     async function loadAdminComments() {
         const container = document.getElementById('admin-comments-list');
         if (!container) return;
@@ -920,9 +921,10 @@
                     }
                 });
             });
-        } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
+        } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; }
     }
 
+    // Загрузка новостей для админки
     async function loadAdminNews() {
         const container = document.getElementById('admin-news-list');
         if (!container) return;
@@ -933,59 +935,53 @@
             if (snapshot.empty) { container.innerHTML = '<p>Нет новостей</p>'; return; }
             container.innerHTML = '';
             for (const docSnap of snapshot.docs) {
-                const n = docSnap.data();
+                const news = docSnap.data();
                 const id = docSnap.id;
                 const div = document.createElement('div');
                 div.className = 'news-item';
                 div.innerHTML = `
-                    <div><strong>${escapeHtml(n.title)}</strong> <button class="small edit-news" data-id="${id}" data-title="${escapeHtml(n.title)}" data-date="${n.date}" data-content="${escapeHtml(n.content)}">✏️ Ред.</button> <button class="small delete" data-id="${id}">🗑 Удалить</button></div>
-                    <div>📅 ${n.date}</div>
-                    <div>${escapeHtml(n.content)}</div>
+                    <div><strong>${escapeHtml(news.title)}</strong></div>
+                    <div>${escapeHtml(news.content)}</div>
+                    <div style="font-size:0.75rem;">📅 ${news.date}</div>
+                    <button class="small delete" data-id="${id}">🗑 Удалить</button>
                 `;
                 container.appendChild(div);
             }
-            container.querySelectorAll('.edit-news').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.dataset.id;
-                    const oldTitle = btn.dataset.title;
-                    const oldDate = btn.dataset.date;
-                    const oldContent = btn.dataset.content;
-                    const newTitle = prompt('Новый заголовок', oldTitle);
-                    if (!newTitle) return;
-                    const newDate = prompt('Новая дата (YYYY-MM-DD)', oldDate);
-                    if (!newDate) return;
-                    const newContent = prompt('Новый текст', oldContent);
-                    if (!newContent) return;
-                    updateDoc(doc(db, 'news', id), { title: newTitle, date: newDate, content: newContent }).then(() => { loadAdminNews(); loadNews(); });
-                });
-            });
             container.querySelectorAll('.delete').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     if (confirm('Удалить новость?')) {
                         await deleteDoc(doc(db, 'news', btn.dataset.id));
                         loadAdminNews();
-                        loadNews();
+                        loadNews(); // обновляем ленту на сайте
                     }
                 });
             });
-        } catch(e) { container.innerHTML = '<p>Ошибка</p>'; }
+        } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; }
     }
 
+    // Создание новости
     document.getElementById('admin-create-news')?.addEventListener('click', async () => {
         const title = document.getElementById('admin-news-title').value.trim();
         const date = document.getElementById('admin-news-date').value.trim();
         const content = document.getElementById('admin-news-content').value.trim();
-        if (!title || !date || !content) { alert('Заполните все поля'); return; }
-        await addDoc(collection(db, 'news'), { title, date, content });
-        document.getElementById('admin-news-title').value = '';
-        document.getElementById('admin-news-date').value = '';
-        document.getElementById('admin-news-content').value = '';
-        loadAdminNews();
-        loadNews();
-        alert('Новость добавлена');
+        if (!title || !date || !content) {
+            alert('Заполните все поля');
+            return;
+        }
+        try {
+            await addDoc(collection(db, 'news'), { title, date, content });
+            document.getElementById('admin-news-title').value = '';
+            document.getElementById('admin-news-date').value = '';
+            document.getElementById('admin-news-content').value = '';
+            loadAdminNews();
+            loadNews();
+            alert('Новость добавлена');
+        } catch(e) {
+            alert('Ошибка добавления');
+        }
     });
 
-    // ---------- ЗАПУСК ----------
+    // ---------- СТАРТ ----------
     loadProjects();
     loadNews();
     loadComments();
