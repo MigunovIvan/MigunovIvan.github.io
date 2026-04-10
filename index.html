@@ -4,23 +4,298 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Иван Мигунов · Портфолио + Админка</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        /* Дополнительные стили для админ-панели внутри index.html */
+        /* ========== ОСНОВНЫЕ СТИЛИ (без изменений) ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: #fafafc;
+            color: #111;
+            line-height: 1.4;
+            transition: background 0.2s, color 0.2s;
+            padding: 0 20px;
+        }
+        body.dark { background: #0f0f12; color: #ededee; }
+        header {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 0 16px;
+            border-bottom: 1px solid #e4e4e7;
+        }
+        body.dark header { border-bottom-color: #2c2c32; }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .avatar { display: flex; align-items: center; gap: 20px; }
+        #profile-photo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+        .avatar h1 { font-size: 1.8rem; font-weight: 600; }
+        .avatar p { color: #666; font-size: 0.85rem; }
+        body.dark .avatar p { color: #aaa; }
+        .theme-switch {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 60px;
+        }
+        .theme-switch:hover { background: #e4e4e7; }
+        body.dark .theme-switch:hover { background: #2a2a30; }
+        .main-nav {
+            max-width: 1200px;
+            margin: 20px auto 0;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #e4e4e7;
+            padding-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 40px;
+            color: #555;
+        }
+        body.dark .nav-btn { color: #bbb; }
+        .nav-btn.active { background: #000; color: white; }
+        body.dark .nav-btn.active { background: #2c2c32; }
+        .nav-btn:hover:not(.active) { background: #eef2ff; }
+        body.dark .nav-btn:hover:not(.active) { background: #25252b; }
+        .section { display: none; animation: fade 0.2s ease; }
+        .section.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .section-header { text-align: center; margin: 32px 0 24px; }
+        .section-header h2 { font-size: 2rem; font-weight: 600; }
+        .toolbar {
+            max-width: 1200px;
+            margin: 20px auto 24px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            background: #fff;
+            padding: 12px 20px;
+            border-radius: 60px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e4e4e7;
+        }
+        body.dark .toolbar { background: #151518; border-color: #2c2c32; }
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f5f5f7;
+            padding: 6px 14px;
+            border-radius: 40px;
+            flex: 2;
+        }
+        body.dark .search-box { background: #25252b; }
+        .search-box input {
+            border: none;
+            background: transparent;
+            padding: 8px 0;
+            font-size: 0.9rem;
+            width: 100%;
+            outline: none;
+            color: inherit;
+        }
+        .sort-box { display: flex; align-items: center; gap: 10px; }
+        select {
+            background: #f5f5f7;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-family: inherit;
+        }
+        .counter {
+            font-weight: 500;
+            background: #eef2ff;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+        }
+        body.dark .counter { background: #2d2d34; }
+        .projects-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 28px;
+            padding: 20px 0 40px;
+        }
+        .project-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid #efeff1;
+            transition: 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .project-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1); border-color: #cbd5e1; }
+        body.dark .project-card { background: #1a1a1f; border-color: #2c2c32; }
+        body.dark .project-card:hover { border-color: #3b3b45; }
+        .project-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: #eef2ff;
+        }
+        .img-fallback {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #6b73ff, #000dff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        .card-body { padding: 18px 20px 22px; flex: 1; display: flex; flex-direction: column; }
+        .project-name { font-size: 1.35rem; font-weight: 600; margin-bottom: 8px; }
+        .project-desc { font-size: 0.85rem; color: #4b5563; margin-bottom: 16px; line-height: 1.4; }
+        body.dark .project-desc { color: #b9b9c3; }
+        .project-meta { display: flex; gap: 16px; font-size: 0.75rem; color: #6c757d; margin: 12px 0 18px; }
+        .project-meta span { display: flex; align-items: center; gap: 5px; }
+        .project-link {
+            margin-top: auto;
+            text-decoration: none;
+            background: #000;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        body.dark .project-link { background: #2c2c32; }
+        .project-link:hover { background: #1e1e24; transform: scale(0.97); }
+        .news-grid {
+            max-width: 800px;
+            margin: 0 auto 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .news-card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid #e4e4e7;
+        }
+        body.dark .news-card { background: #1a1a1f; border-color: #2c2c32; }
+        .news-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 8px; }
+        .news-date { font-size: 0.75rem; color: #6c757d; margin-bottom: 16px; }
+        .news-content { line-height: 1.5; }
+        .news-card .project-link { display: inline-block; margin-top: 12px; padding: 6px 16px; font-size: 0.85rem; }
+        .comments-wrapper { max-width: 800px; margin: 0 auto; }
+        .comments-list { margin-bottom: 40px; }
+        .comment-item {
+            background: white;
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid #e4e4e7;
+        }
+        body.dark .comment-item { background: #1a1a1f; }
+        .comment-author { font-weight: 700; margin-bottom: 6px; }
+        .comment-date { font-size: 0.7rem; color: #6c757d; margin-bottom: 10px; }
+        .comment-text { word-break: break-word; }
+        .comment-form {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid #e4e4e7;
+        }
+        body.dark .comment-form { background: #1a1a1f; }
+        .comment-form h3 { margin-bottom: 16px; }
+        .comment-form input, .comment-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background: #f9f9fc;
+            font-family: inherit;
+        }
+        body.dark .comment-form input, body.dark .comment-form textarea { background: #2a2a30; border-color: #3b3b45; color: white; }
+        .comment-form button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .contact-card {
+            max-width: 700px;
+            margin: 0 auto 60px;
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            border: 1px solid #e4e4e7;
+        }
+        body.dark .contact-card { background: #1a1a1f; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background: #f9f9fc;
+            font-family: inherit;
+        }
+        body.dark .form-group input, body.dark .form-group textarea { background: #2a2a30; border-color: #3b3b45; color: white; }
+        .contact-card button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .form-feedback { margin-top: 16px; padding: 10px; border-radius: 20px; text-align: center; }
+        .contact-note { margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee; text-align: center; }
+        .contact-note a { color: #0066cc; text-decoration: none; }
+        body.dark .contact-note { border-top-color: #2c2c32; }
+        .error-message { text-align: center; padding: 60px; background: #fff0f0; border-radius: 40px; max-width: 500px; margin: 40px auto; }
+        .skeleton { background: white; border-radius: 24px; border: 1px solid #efeff1; }
+        body.dark .skeleton { background: #1a1a1f; }
+        .skeleton-img { height: 160px; background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        .skeleton-text { padding: 18px; }
+        .skeleton-line { height: 18px; background: #e2e8f0; margin-bottom: 12px; border-radius: 20px; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        footer { text-align: center; padding: 32px; border-top: 1px solid #e4e4e7; margin-top: 40px; color: #6c757d; }
+        @media (max-width: 700px) { body { padding: 0 12px; } .toolbar { flex-direction: column; align-items: stretch; border-radius: 32px; } .main-nav { justify-content: center; } }
+
+        /* ========== СТИЛИ АДМИНКИ ========== */
         .admin-panel {
             margin-top: 60px;
             border-top: 2px solid #e4e4e7;
             padding: 30px 0;
             background: #f9fafc;
         }
-        body.dark .admin-panel {
-            background: #111114;
-            border-top-color: #2c2c32;
-        }
-        .admin-toggle {
-            text-align: center;
-            margin: 20px 0;
-        }
+        body.dark .admin-panel { background: #111114; border-top-color: #2c2c32; }
+        .admin-toggle { text-align: center; margin: 20px 0; }
         .admin-login-btn {
             background: #000;
             color: white;
@@ -37,9 +312,7 @@
             border-radius: 28px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        body.dark .admin-login-form {
-            background: #1e1e24;
-        }
+        body.dark .admin-login-form { background: #1e1e24; }
         .admin-login-form input {
             width: 100%;
             padding: 10px;
@@ -71,13 +344,8 @@
             border-radius: 40px;
             cursor: pointer;
         }
-        .admin-section {
-            display: none;
-            margin-bottom: 30px;
-        }
-        .admin-section.active {
-            display: block;
-        }
+        .admin-section { display: none; margin-bottom: 30px; }
+        .admin-section.active { display: block; }
         .admin-card {
             background: white;
             border-radius: 24px;
@@ -85,31 +353,26 @@
             margin-bottom: 20px;
             border: 1px solid #e4e4e7;
         }
-        body.dark .admin-card {
-            background: #1a1a1f;
-        }
-        .message-item, .comment-item, .news-item {
-            border-bottom: 1px solid #eee;
-            padding: 16px 0;
-        }
+        body.dark .admin-card { background: #1a1a1f; }
+        .message-item, .comment-item, .news-item { border-bottom: 1px solid #eee; padding: 16px 0; }
         .admin-card button.small {
             background: #000;
             padding: 4px 12px;
             font-size: 0.8rem;
             margin-left: 8px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            color: white;
         }
-        .admin-card button.delete {
-            background: #dc2626;
-        }
+        .admin-card button.delete { background: #dc2626; }
         .news-form {
             background: #f9f9fc;
             padding: 20px;
             border-radius: 24px;
             margin-bottom: 20px;
         }
-        body.dark .news-form {
-            background: #25252b;
-        }
+        body.dark .news-form { background: #25252b; }
         .news-form input, .news-form textarea {
             width: 100%;
             padding: 10px;
@@ -123,10 +386,7 @@
             border-radius: 20px;
             font-size: 0.7rem;
         }
-        .badge.unread {
-            background: #dc2626;
-            color: white;
-        }
+        .badge.unread { background: #dc2626; color: white; }
     </style>
 </head>
 <body>
@@ -211,7 +471,7 @@
 
 <!-- Админ-панель (скрыта по умолчанию) -->
 <div id="admin-panel" style="display: none;">
-    <div class="admin-panel container">
+    <div class="admin-panel container" style="max-width:1200px; margin:0 auto;">
         <div id="admin-login-area">
             <div class="admin-login-form">
                 <h3>Вход в админ-панель</h3>
@@ -257,12 +517,14 @@
     </div>
 </div>
 
-<!-- Firebase SDK -->
+<!-- Firebase SDK + основной скрипт -->
 <script type="module">
+    // ========== ИНИЦИАЛИЗАЦИЯ FIREBASE ==========
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
+    // 🔧 ЗАМЕНИТЕ ЭТИ ДАННЫЕ НА ВАШИ ИЗ КОНСОЛИ FIREBASE 🔧
     const firebaseConfig = {
     apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
     authDomain: "github-9265f.firebaseapp.com",
@@ -276,27 +538,10 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    // Глобальные функции для использования в других частях
     window.db = db;
     window.auth = auth;
-    window.collection = collection;
-    window.addDoc = addDoc;
-    window.getDocs = getDocs;
-    window.updateDoc = updateDoc;
-    window.deleteDoc = deleteDoc;
-    window.doc = doc;
-    window.orderBy = orderBy;
-    window.query = query;
-    window.serverTimestamp = serverTimestamp;
-    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-    window.onAuthStateChanged = onAuthStateChanged;
-    window.signOut = signOut;
 
-    // Импортируем основной скрипт (он ниже)
-    import("./script.js").catch(e => console.error("Ошибка загрузки основного скрипта", e));
-</script>
-
-<!-- Встроенный скрипт для админки и общего функционала -->
-<script type="module">
     // ========== 1. ТЁМНАЯ ТЕМА ==========
     const themeBtn = document.getElementById('toggle-theme');
     function loadTheme() {
@@ -352,7 +597,9 @@
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
     function formatDate(dateString) {
-        return new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '—';
+        return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
     }
     function createCard(project) {
         const card = document.createElement('div');
@@ -424,7 +671,7 @@
     sortSelect?.addEventListener('change', renderProjects);
     retryBtn?.addEventListener('click', loadProjects);
 
-    // ========== 4. НОВОСТИ (Firestore + README) ==========
+    // ========== 4. НОВОСТИ (Firestore + README) С ФИЛЬТРАЦИЕЙ НЕКОРРЕКТНЫХ ДАТ ==========
     async function fetchReadmeForRepo(repoName, repoUpdatedAt) {
         const cacheKey = `readme_${repoName}`;
         const cached = localStorage.getItem(cacheKey);
@@ -451,24 +698,43 @@
         if (!newsContainer) return;
         newsContainer.innerHTML = '<div class="news-card">📡 Загрузка...</div>';
         let allNewsItems = [];
+
+        // 1. Ручные новости из Firestore
         try {
             const q = query(collection(db, 'news'), orderBy('date', 'desc'));
             const snapshot = await getDocs(q);
             snapshot.forEach(doc => {
                 const n = doc.data();
-                allNewsItems.push({ type: 'manual', title: n.title, date: n.date, content: n.content, url: null });
+                if (n.date && !isNaN(new Date(n.date).getTime())) {  // <--- защита от invalid date
+                    allNewsItems.push({ type: 'manual', title: n.title, date: n.date, content: n.content, url: null });
+                } else {
+                    console.warn('Пропущена новость с некорректной датой:', n.title);
+                }
             });
         } catch(e) { console.error(e); }
+
+        // 2. Автоматические новости из README
         if (allProjects.length === 0) await new Promise(resolve => setTimeout(resolve, 1500));
         const readmePromises = allProjects.map(async (p) => {
             const readme = await fetchReadmeForRepo(p.name, p.updated_at);
             if (!readme) return null;
-            return { type: 'project', title: `📁 ${p.name}`, date: p.updated_at.slice(0,10), content: readme.text, url: p.html_url };
+            const date = p.updated_at.slice(0,10);
+            if (date && !isNaN(new Date(date).getTime())) {   // <--- защита от invalid date
+                return { type: 'project', title: `📁 ${p.name}`, date: date, content: readme.text, url: p.html_url };
+            }
+            return null;
         });
         const projectNews = (await Promise.all(readmePromises)).filter(i => i);
         allNewsItems.push(...projectNews);
+
+        // 3. Сортировка по дате (новые сверху)
         allNewsItems.sort((a,b) => new Date(b.date) - new Date(a.date));
-        if (allNewsItems.length === 0) { newsContainer.innerHTML = '<div class="news-card">Новостей нет</div>'; return; }
+
+        if (allNewsItems.length === 0) {
+            newsContainer.innerHTML = '<div class="news-card">Новостей нет</div>';
+            return;
+        }
+
         newsContainer.innerHTML = '';
         for (const item of allNewsItems) {
             const card = document.createElement('div');
@@ -538,15 +804,19 @@
         } catch(err) { formFeedback.innerHTML = '<span style="color:red;">Ошибка</span>'; }
     });
 
-    // ========== 7. АДМИН-ПАНЕЛЬ (скрытая) ==========
+    // ========== 7. АДМИН-ПАНЕЛЬ (скрытая, с кнопкой) ==========
     const adminPanel = document.getElementById('admin-panel');
     const adminLoginArea = document.getElementById('admin-login-area');
     const adminContentArea = document.getElementById('admin-content-area');
     const showAdminBtn = document.getElementById('show-admin-login');
-    let adminLoggedIn = false;
 
+    // Кнопка "Вход для админа" — показывает/скрывает панель
     showAdminBtn?.addEventListener('click', () => {
-        adminPanel.style.display = adminPanel.style.display === 'none' ? 'block' : 'none';
+        if (adminPanel.style.display === 'none') {
+            adminPanel.style.display = 'block';
+        } else {
+            adminPanel.style.display = 'none';
+        }
     });
 
     // Логин админа
@@ -559,7 +829,6 @@
             errorDiv.textContent = '';
             adminLoginArea.style.display = 'none';
             adminContentArea.style.display = 'block';
-            adminLoggedIn = true;
             loadAdminMessages();
             loadAdminComments();
             loadAdminNews();
@@ -571,8 +840,9 @@
         await signOut(auth);
         adminLoginArea.style.display = 'block';
         adminContentArea.style.display = 'none';
-        adminLoggedIn = false;
     });
+
+    // Если пользователь уже авторизован (например, после перезагрузки) — показываем контент
     onAuthStateChanged(auth, (user) => {
         if (user && adminPanel.style.display !== 'none') {
             adminLoginArea.style.display = 'none';
@@ -701,7 +971,7 @@
                     if (!newDate) return;
                     const newContent = prompt('Новый текст', oldContent);
                     if (!newContent) return;
-                    updateDoc(doc(db, 'news', id), { title: newTitle, date: newDate, content: newContent }).then(() => loadAdminNews());
+                    updateDoc(doc(db, 'news', id), { title: newTitle, date: newDate, content: newContent }).then(() => { loadAdminNews(); loadNews(); });
                 });
             });
             container.querySelectorAll('.delete').forEach(btn => {
@@ -709,7 +979,7 @@
                     if (confirm('Удалить новость?')) {
                         await deleteDoc(doc(db, 'news', btn.dataset.id));
                         loadAdminNews();
-                        loadNews(); // обновляем основной блок новостей
+                        loadNews();
                     }
                 });
             });
@@ -729,7 +999,7 @@
         alert('Новость добавлена');
     });
 
-    // Старт
+    // ========== ЗАПУСК ОСНОВНЫХ ФУНКЦИЙ ==========
     loadProjects();
     loadNews();
     loadComments();
