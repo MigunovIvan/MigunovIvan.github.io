@@ -3,560 +3,1007 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Иван Мигунов · Портфолио + Админка</title>
+    <title>Иван Мигунов · Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Figtree:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            color: #111;
-            line-height: 1.4;
-            transition: background 0.2s, color 0.2s;
-            padding: 0 20px;
-            background-image: url('images/Theme.jpg');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            background-repeat: no-repeat;
+        :root {
+            --bg: #07070f;
+            --bg2: #0d0d1a;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.07);
+            --border: rgba(255,255,255,0.08);
+            --border-hover: rgba(62,255,200,0.35);
+            --accent: #3effc8;
+            --accent2: #6b5de8;
+            --text: #f0f0f8;
+            --text-muted: #6b6b80;
+            --text-dim: rgba(240,240,248,0.55);
+            --card-radius: 20px;
+            --font-head: 'Syne', sans-serif;
+            --font-body: 'Figtree', sans-serif;
+            --font-mono: 'DM Mono', monospace;
         }
-        body::before {
-            content: '';
+        body.light {
+            --bg: #f4f3ff;
+            --bg2: #eceafa;
+            --surface: rgba(255,255,255,0.7);
+            --surface-hover: rgba(255,255,255,0.9);
+            --border: rgba(0,0,0,0.08);
+            --border-hover: rgba(62,180,140,0.5);
+            --text: #0f0f1a;
+            --text-muted: #7a7a90;
+            --text-dim: rgba(15,15,26,0.55);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.4s, color 0.4s;
+        }
+
+        /* ── ANIMATED BACKGROUND ── */
+        .bg-canvas {
             position: fixed;
             inset: 0;
-            background: rgba(250, 250, 252, 0.88);
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.18;
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+        body.light .bg-blob { opacity: 0.28; }
+        .bg-blob:nth-child(1) { width: 700px; height: 700px; background: #6b5de8; top: -200px; left: -200px; animation-duration: 20s; }
+        .bg-blob:nth-child(2) { width: 500px; height: 500px; background: #3effc8; top: 40%; right: -150px; animation-duration: 16s; animation-direction: alternate-reverse; }
+        .bg-blob:nth-child(3) { width: 400px; height: 400px; background: #ff5e87; bottom: -100px; left: 30%; animation-duration: 24s; }
+        @keyframes drift {
+            0% { transform: translate(0,0) scale(1); }
+            100% { transform: translate(60px, 40px) scale(1.12); }
+        }
+
+        /* Grid overlay */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
             z-index: 0;
             pointer-events: none;
-            transition: background 0.3s;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
         }
-        body.dark { color: #ededee; }
-        body.dark::before {
-            background: rgba(15, 15, 18, 0.90);
+        body.light .bg-grid {
+            background-image:
+                linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
         }
-        header, nav, main, footer, #admin-panel {
+
+        /* ── LAYOUT ── */
+        .shell {
             position: relative;
             z-index: 1;
-        }
-        header {
-            max-width: 1200px;
+            max-width: 1160px;
             margin: 0 auto;
-            padding: 24px 0 16px;
-            border-bottom: 1px solid #e4e4e7;
+            padding: 0 24px;
         }
-        body.dark header { border-bottom-color: #2c2c32; }
+
+        /* ── HEADER ── */
+        header {
+            position: relative;
+            z-index: 10;
+            padding: 32px 0 0;
+        }
         .header-inner {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
             gap: 20px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border);
         }
-        .avatar { display: flex; align-items: center; gap: 20px; }
+        .avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .avatar-ring {
+            position: relative;
+            width: 60px; height: 60px;
+            flex-shrink: 0;
+        }
+        .avatar-ring::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent), var(--accent2), var(--accent));
+            animation: spin 4s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         #profile-photo {
-            width: 64px;
-            height: 64px;
+            position: relative;
+            width: 100%; height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #ddd;
+            border: 3px solid var(--bg);
+            z-index: 1;
+            display: block;
         }
-        .avatar h1 { font-size: 1.8rem; font-weight: 600; }
-        .avatar p { color: #666; font-size: 0.85rem; }
-        body.dark .avatar p { color: #aaa; }
-        .theme-switch {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 60px;
+        .avatar-text h1 {
+            font-family: var(--font-head);
+            font-size: 1.65rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1;
         }
-        .theme-switch:hover { background: #e4e4e7; }
-        body.dark .theme-switch:hover { background: #2a2a30; }
-        .main-nav {
-            max-width: 1200px;
-            margin: 20px auto 0;
+        .avatar-text .tagline {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--accent);
+            margin-top: 5px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .header-actions {
             display: flex;
-            gap: 8px;
-            border-bottom: 1px solid #e4e4e7;
-            padding-bottom: 8px;
+            align-items: center;
+            gap: 10px;
+        }
+        .theme-btn {
+            width: 40px; height: 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+            color: var(--text);
+        }
+        .theme-btn:hover { background: var(--surface-hover); border-color: var(--border-hover); }
+
+        /* ── NAV ── */
+        .main-nav {
+            display: flex;
+            gap: 4px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
             flex-wrap: wrap;
         }
         .nav-btn {
-            background: none;
-            border: none;
-            padding: 10px 24px;
-            font-size: 1rem;
-            font-weight: 500;
+            font-family: var(--font-head);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 9px 20px;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 12px;
             cursor: pointer;
-            border-radius: 40px;
-            color: #555;
+            color: var(--text-muted);
+            letter-spacing: 0.01em;
+            transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
         }
-        body.dark .nav-btn { color: #bbb; }
-        .nav-btn.active { background: #000; color: white; }
-        body.dark .nav-btn.active { background: #2c2c32; }
-        .nav-btn:hover:not(.active) { background: #eef2ff; }
-        body.dark .nav-btn:hover:not(.active) { background: #25252b; }
-        .section { display: none; animation: fade 0.2s ease; }
+        .nav-btn:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+        .nav-btn.active {
+            color: var(--bg);
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(62,255,200,0.3);
+        }
+        body.light .nav-btn.active { color: #07070f; }
+
+        /* ── SECTIONS ── */
+        .section { display: none; animation: fadeUp 0.3s ease; }
         .section.active { display: block; }
-        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        .section-header { text-align: center; margin: 32px 0 24px; }
-        .section-header h2 { font-size: 2rem; font-weight: 600; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-hero {
+            padding: 52px 0 36px;
+            text-align: center;
+        }
+        .section-hero h2 {
+            font-family: var(--font-head);
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+        .section-hero .sub {
+            color: var(--text-dim);
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+        .accent-word { color: var(--accent); }
+
+        /* ── TOOLBAR ── */
         .toolbar {
-            max-width: 1200px;
-            margin: 20px auto 24px;
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
+            gap: 12px;
             align-items: center;
-            gap: 15px;
-            background: #fff;
-            padding: 12px 20px;
-            border-radius: 60px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #e4e4e7;
+            justify-content: space-between;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 18px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 28px;
         }
-        body.dark .toolbar { background: #151518; border-color: #2c2c32; }
         .search-box {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #f5f5f7;
-            padding: 6px 14px;
-            border-radius: 40px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 10px;
             flex: 2;
+            min-width: 160px;
+            transition: border-color 0.2s;
         }
-        body.dark .search-box { background: #25252b; }
+        body.light .search-box { background: rgba(0,0,0,0.04); }
+        .search-box:focus-within { border-color: var(--accent); }
         .search-box input {
             border: none;
             background: transparent;
-            padding: 8px 0;
-            font-size: 0.9rem;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--text);
             width: 100%;
             outline: none;
-            color: inherit;
         }
-        .sort-box { display: flex; align-items: center; gap: 10px; }
-        select {
-            background: #f5f5f7;
-            border: 1px solid #ddd;
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-family: inherit;
+        .search-box input::placeholder { color: var(--text-muted); }
+        .sort-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
-        .counter {
-            font-weight: 500;
-            background: #eef2ff;
+        .sort-wrap select {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 7px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        body.light .sort-wrap select { background: rgba(0,0,0,0.05); }
+        .counter-pill {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            background: rgba(62,255,200,0.1);
+            border: 1px solid rgba(62,255,200,0.2);
             padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.85rem;
+            border-radius: 8px;
+            white-space: nowrap;
         }
-        body.dark .counter { background: #2d2d34; }
+
+        /* ── PROJECT GRID ── */
         .projects-grid {
-            max-width: 1200px;
-            margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 28px;
-            padding: 20px 0 40px;
+            gap: 20px;
+            padding-bottom: 60px;
         }
         .project-card {
-            background: white;
-            border-radius: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
             overflow: hidden;
-            border: 1px solid #efeff1;
-            transition: 0.2s ease;
             display: flex;
             flex-direction: column;
+            backdrop-filter: blur(12px);
+            transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+            position: relative;
         }
-        .project-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1); border-color: #cbd5e1; }
-        body.dark .project-card { background: #1a1a1f; border-color: #2c2c32; }
-        body.dark .project-card:hover { border-color: #3b3b45; }
+        .project-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(62,255,200,0.04) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+        .project-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-hover);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(62,255,200,0.1);
+        }
+        .project-card:hover::before { opacity: 1; }
         .project-img {
             width: 100%;
-            height: 160px;
+            height: 148px;
             object-fit: cover;
-            background: #eef2ff;
         }
         .img-fallback {
             width: 100%;
-            height: 160px;
-            background: linear-gradient(135deg, #6b73ff, #000dff);
+            height: 148px;
+            background: linear-gradient(135deg, #1a1140 0%, #0d3d30 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 500;
-            font-size: 1.1rem;
+            font-size: 2rem;
         }
-        .card-body { padding: 18px 20px 22px; flex: 1; display: flex; flex-direction: column; }
-        .project-name { font-size: 1.35rem; font-weight: 600; margin-bottom: 8px; }
-        .project-desc { font-size: 0.85rem; color: #4b5563; margin-bottom: 16px; line-height: 1.4; }
-        body.dark .project-desc { color: #b9b9c3; }
-        .project-meta { display: flex; gap: 16px; font-size: 0.75rem; color: #6c757d; margin: 12px 0 18px; }
-        .project-meta span { display: flex; align-items: center; gap: 5px; }
-        .project-link {
-            margin-top: auto;
-            text-decoration: none;
-            background: #000;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-            border-radius: 40px;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-        body.dark .project-link { background: #2c2c32; }
-        .project-link:hover { background: #1e1e24; transform: scale(0.97); }
-        .news-grid {
-            max-width: 800px;
-            margin: 0 auto 40px;
+        .card-body {
+            padding: 18px 20px 22px;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+        }
+        .card-lang {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .project-name {
+            font-family: var(--font-head);
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 8px;
+        }
+        .project-desc {
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            line-height: 1.55;
+            margin-bottom: 16px;
+            flex: 1;
+        }
+        .project-meta {
+            display: flex;
+            gap: 14px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .project-link {
+            display: block;
+            text-decoration: none;
+            background: var(--accent);
+            color: #07070f;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            font-family: var(--font-head);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .project-link:hover { opacity: 0.85; transform: scale(0.98); }
+
+        /* ── SKELETON ── */
+        .skeleton {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+        }
+        .skeleton-img {
+            height: 148px;
+            background: linear-gradient(90deg, var(--surface) 25%, rgba(255,255,255,0.06) 50%, var(--surface) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+        .skeleton-body { padding: 18px; }
+        .skeleton-line {
+            height: 14px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.06);
+            margin-bottom: 10px;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* ── NEWS ── */
+        .news-grid {
+            max-width: 720px;
+            margin: 0 auto 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
         .news-card {
-            background: white;
-            border-radius: 28px;
-            padding: 24px;
-            border: 1px solid #e4e4e7;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            padding: 24px 28px;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.2s;
         }
-        body.dark .news-card { background: #1a1a1f; border-color: #2c2c32; }
-        .news-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 8px; }
-        .news-date { font-size: 0.75rem; color: #6c757d; margin-bottom: 16px; }
-        .news-content { line-height: 1.5; }
-        .news-card .project-link { display: inline-block; margin-top: 12px; padding: 6px 16px; font-size: 0.85rem; }
-        .comments-wrapper { max-width: 800px; margin: 0 auto; }
-        .comments-list { margin-bottom: 40px; }
+        .news-card:hover { border-color: var(--border-hover); }
+        .news-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        .news-title {
+            font-family: var(--font-head);
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .news-date {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+        .news-content { font-size: 0.875rem; color: var(--text-dim); line-height: 1.6; }
+        .news-link {
+            display: inline-block;
+            margin-top: 14px;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            border-bottom: 1px solid rgba(62,255,200,0.3);
+            padding-bottom: 2px;
+            transition: border-color 0.2s;
+        }
+        .news-link:hover { border-color: var(--accent); }
+
+        /* ── COMMENTS ── */
+        .comments-shell {
+            max-width: 720px;
+            margin: 0 auto 60px;
+        }
         .comment-item {
-            background: white;
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 16px;
-            border: 1px solid #e4e4e7;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            backdrop-filter: blur(12px);
         }
-        body.dark .comment-item { background: #1a1a1f; }
-        .comment-author { font-weight: 700; margin-bottom: 6px; }
-        .comment-date { font-size: 0.7rem; color: #6c757d; margin-bottom: 10px; }
-        .comment-text { word-break: break-word; }
-        .comment-form {
-            background: white;
-            border-radius: 28px;
-            padding: 24px;
-            border: 1px solid #e4e4e7;
+        .comment-author {
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
         }
-        body.dark .comment-form { background: #1a1a1f; }
-        .comment-form h3 { margin-bottom: 16px; }
-        .comment-form input, .comment-form textarea {
+        .comment-date {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .comment-text { font-size: 0.875rem; color: var(--text-dim); line-height: 1.55; }
+
+        .comment-form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            padding: 28px;
+            backdrop-filter: blur(12px);
+        }
+        .comment-form-card h3 {
+            font-family: var(--font-head);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        /* ── FORM FIELDS ── */
+        .field-group { margin-bottom: 14px; }
+        .field-group label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .field-group input,
+        .field-group textarea,
+        .comment-form-card input,
+        .comment-form-card textarea {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 16px;
-            border-radius: 20px;
-            border: 1px solid #ddd;
-            background: #f9f9fc;
-            font-family: inherit;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 12px;
         }
-        body.dark .comment-form input, body.dark .comment-form textarea { background: #2a2a30; border-color: #3b3b45; color: white; }
-        .comment-form button {
-            background: #000;
-            color: white;
+        body.light .field-group input,
+        body.light .field-group textarea,
+        body.light .comment-form-card input,
+        body.light .comment-form-card textarea {
+            background: rgba(0,0,0,0.04);
+        }
+        .field-group input:focus,
+        .field-group textarea:focus,
+        .comment-form-card input:focus,
+        .comment-form-card textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(62,255,200,0.1);
+        }
+        .btn-primary {
+            font-family: var(--font-head);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            background: var(--accent);
+            color: #07070f;
             border: none;
-            padding: 12px 24px;
-            border-radius: 40px;
+            padding: 11px 24px;
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: 500;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+        .btn-primary:hover { opacity: 0.88; transform: scale(0.98); }
+
+        /* ── CONTACT ── */
+        .contact-shell {
+            max-width: 640px;
+            margin: 0 auto 60px;
         }
         .contact-card {
-            max-width: 700px;
-            margin: 0 auto 60px;
-            background: white;
-            border-radius: 32px;
-            padding: 40px;
-            border: 1px solid #e4e4e7;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            padding: 36px;
+            backdrop-filter: blur(12px);
         }
-        body.dark .contact-card { background: #1a1a1f; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 20px;
-            border: 1px solid #ddd;
-            background: #f9f9fc;
-            font-family: inherit;
+        .form-feedback {
+            margin-top: 14px;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
         }
-        body.dark .form-group input, body.dark .form-group textarea { background: #2a2a30; border-color: #3b3b45; color: white; }
-        .contact-card button {
-            background: #000;
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 600;
+        .contact-note {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-dim);
         }
-        .form-feedback { margin-top: 16px; padding: 10px; border-radius: 20px; text-align: center; }
-        .contact-note { margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee; text-align: center; }
-        .contact-note a { color: #0066cc; text-decoration: none; }
-        body.dark .contact-note { border-top-color: #2c2c32; }
-        .error-message { text-align: center; padding: 60px; background: #fff0f0; border-radius: 40px; max-width: 500px; margin: 40px auto; }
-        .skeleton { background: white; border-radius: 24px; border: 1px solid #efeff1; }
-        body.dark .skeleton { background: #1a1a1f; }
-        .skeleton-img { height: 160px; background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
-        .skeleton-text { padding: 18px; }
-        .skeleton-line { height: 18px; background: #e2e8f0; margin-bottom: 12px; border-radius: 20px; }
-        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        footer { text-align: center; padding: 32px; border-top: 1px solid #e4e4e7; margin-top: 40px; color: #6c757d; }
-        @media (max-width: 700px) { body { padding: 0 12px; } .toolbar { flex-direction: column; align-items: stretch; border-radius: 32px; } .main-nav { justify-content: center; } }
- 
-        /* ========== СТИЛИ АДМИНКИ ========== */
-        .admin-panel {
-            border-top: 2px solid #e4e4e7;
-            padding: 30px 0;
-            background: rgba(249, 250, 252, 0.85);
+        .contact-note a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(62,255,200,0.3);
+            transition: border-color 0.2s;
         }
-        body.dark .admin-panel { background: rgba(17, 17, 20, 0.85); border-top-color: #2c2c32; }
-        .admin-toggle { text-align: center; margin: 20px 0; }
-        .admin-login-btn {
-            background: #000;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            cursor: pointer;
+        .contact-note a:hover { border-color: var(--accent); }
+
+        /* ── FOOTER ── */
+        footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--border);
+            padding: 28px 0;
+            text-align: center;
         }
-        .admin-login-form {
-            max-width: 400px;
-            margin: 0 auto 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 28px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        body.dark .admin-login-form { background: #1e1e24; }
-        .admin-login-form h3 { margin-bottom: 16px; }
-        .admin-login-form input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 12px;
-            border-radius: 20px;
-            border: 1px solid #ddd;
-            font-family: inherit;
-            background: #f9f9fc;
-            color: inherit;
-        }
-        body.dark .admin-login-form input { background: #2a2a30; border-color: #3b3b45; color: white; }
-        .admin-login-form button {
-            width: 100%;
-            background: #000;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .admin-controls {
+        .footer-inner {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 24px;
             display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
+            align-items: center;
+            justify-content: space-between;
             flex-wrap: wrap;
+            gap: 12px;
         }
-        .admin-controls button {
-            background: #000;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
+        .footer-copy {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .footer-copy a { color: var(--accent); text-decoration: none; }
+        .admin-trigger-btn {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .admin-trigger-btn:hover { border-color: var(--border-hover); color: var(--text); }
+
+        /* ── ERROR ── */
+        .error-card {
+            background: rgba(255,60,60,0.08);
+            border: 1px solid rgba(255,60,60,0.2);
+            border-radius: var(--card-radius);
+            padding: 40px;
+            text-align: center;
+            max-width: 440px;
+            margin: 40px auto;
+        }
+        .error-card button {
+            margin-top: 16px;
+            font-family: var(--font-head);
+            font-weight: 700;
+            background: rgba(255,60,60,0.15);
+            border: 1px solid rgba(255,60,60,0.3);
+            color: #ff6b6b;
+            padding: 9px 20px;
+            border-radius: 8px;
             cursor: pointer;
         }
-        .admin-section { display: none; margin-bottom: 30px; max-width: 1200px; margin-left: auto; margin-right: auto; }
-        .admin-section.active { display: block; }
-        .admin-card {
-            background: white;
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #e4e4e7;
+
+        /* ── ADMIN PANEL ── */
+        #admin-panel { position: relative; z-index: 1; }
+        .admin-wrap {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
         }
-        body.dark .admin-card { background: #1a1a1f; }
-        .message-item, .news-item { border-bottom: 1px solid #eee; padding: 16px 0; }
-        .admin-card button.small {
-            background: #000;
-            padding: 4px 12px;
-            font-size: 0.8rem;
-            margin-left: 8px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            color: white;
+        .admin-shell { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+        .admin-login-card {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            padding: 28px;
+            backdrop-filter: blur(12px);
         }
-        .admin-card button.delete { background: #dc2626; }
-        .news-form {
-            background: #f9f9fc;
-            padding: 20px;
-            border-radius: 24px;
-            margin-bottom: 20px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+        .admin-login-card h3 {
+            font-family: var(--font-head);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 18px;
         }
-        body.dark .news-form { background: #25252b; }
-        .news-form h3 { margin-bottom: 14px; }
-        .news-form input, .news-form textarea {
+        .admin-login-card input {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 12px;
-            border-radius: 16px;
-            border: 1px solid #ddd;
-            font-family: inherit;
-            background: white;
-            color: inherit;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--text);
+            outline: none;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
         }
-        body.dark .news-form input, body.dark .news-form textarea { background: #1a1a1f; border-color: #3b3b45; color: white; }
-        .news-form button {
-            background: #000;
-            color: white;
+        body.light .admin-login-card input { background: rgba(0,0,0,0.04); }
+        .admin-login-card input:focus { border-color: var(--accent); }
+        .admin-login-card button {
+            width: 100%;
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: var(--accent);
+            color: #07070f;
             border: none;
-            padding: 10px 24px;
-            border-radius: 40px;
+            padding: 11px;
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: 500;
         }
+        #admin-login-error { color: #ff6b6b; font-size: 0.8rem; margin-bottom: 10px; font-family: var(--font-mono); }
+
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+        .admin-tab-btn {
+            font-family: var(--font-head);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 8px 18px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .admin-tab-btn:hover { color: var(--text); border-color: var(--border-hover); }
+        .admin-tab-btn.active { background: var(--accent); color: #07070f; border-color: var(--accent); }
+        .admin-tab-btn.danger { background: rgba(220,38,38,0.12); border-color: rgba(220,38,38,0.25); color: #fc7171; }
+        .admin-tab-btn.danger:hover { background: rgba(220,38,38,0.2); }
+
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+
+        .admin-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            padding: 22px 24px;
+            margin-bottom: 18px;
+            backdrop-filter: blur(12px);
+        }
+        .admin-card h3 {
+            font-family: var(--font-head);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .message-item, .news-item {
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            font-size: 0.855rem;
+        }
+        .message-item:last-child, .news-item:last-child { border-bottom: none; }
+
         .badge {
-            background: #eef2ff;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(62,255,200,0.1);
+            color: var(--accent);
+            border: 1px solid rgba(62,255,200,0.2);
+            letter-spacing: 0.06em;
         }
-        .badge.unread { background: #dc2626; color: white; }
+        .badge.unread { background: rgba(220,38,38,0.15); color: #fc7171; border-color: rgba(220,38,38,0.25); }
+
+        .small-btn {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background: rgba(255,255,255,0.07);
+            color: var(--text);
+            margin-left: 6px;
+            transition: 0.2s;
+        }
+        .small-btn.delete { background: rgba(220,38,38,0.15); color: #fc7171; }
+        .small-btn:hover { opacity: 0.75; }
+
+        .news-form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--card-radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(12px);
+        }
+        .news-form-card h3 {
+            font-family: var(--font-head);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+        .news-form-card input, .news-form-card textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--text);
+            outline: none;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+        body.light .news-form-card input, body.light .news-form-card textarea { background: rgba(0,0,0,0.04); }
+        .news-form-card input:focus, .news-form-card textarea:focus { border-color: var(--accent); }
+
+        @media (max-width: 640px) {
+            .avatar-text h1 { font-size: 1.3rem; }
+            .section-hero h2 { font-size: 2rem; }
+            .contact-card { padding: 22px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+        }
     </style>
 </head>
 <body>
- 
+
+<!-- Background -->
+<div class="bg-canvas">
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+</div>
+<div class="bg-grid"></div>
+
 <header>
-    <div class="header-inner">
-        <div class="avatar">
-            <img src="images/profile.jpg" alt="Ivan Migunov" id="profile-photo">
-            <div>
-                <h1>Иван Мигунов</h1>
-                <p>frontend & pet‑проекты</p>
+    <div class="shell">
+        <div class="header-inner">
+            <div class="avatar-row">
+                <div class="avatar-ring">
+                    <img src="images/profile.jpg" alt="Ivan Migunov" id="profile-photo">
+                </div>
+                <div class="avatar-text">
+                    <h1>Иван Мигунов</h1>
+                    <div class="tagline">Frontend · Pet-projects</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="toggle-theme" class="theme-btn" title="Сменить тему">🌙</button>
             </div>
         </div>
-        <button id="toggle-theme" class="theme-switch">🌙</button>
+
+        <nav class="main-nav">
+            <button class="nav-btn active" data-section="projects">📂 Проекты</button>
+            <button class="nav-btn" data-section="news">📰 Новости</button>
+            <button class="nav-btn" data-section="comments">💬 Гостевая</button>
+            <button class="nav-btn" data-section="contact">📩 Контакты</button>
+        </nav>
     </div>
 </header>
- 
-<nav class="main-nav">
-    <button class="nav-btn active" data-section="projects">📂 Проекты</button>
-    <button class="nav-btn" data-section="news">📰 Новости</button>
-    <button class="nav-btn" data-section="comments">💬 Гостевая книга</button>
-    <button class="nav-btn" data-section="contact">📩 Контакты</button>
-</nav>
- 
+
 <main>
+    <!-- PROJECTS -->
     <section id="projects-section" class="section active">
-        <div class="toolbar">
-            <div class="search-box"><span>🔍</span><input type="text" id="search" placeholder="Название или описание..."></div>
-            <div class="sort-box"><label>📋 Сортировать:</label><select id="sort"><option value="name">по имени</option><option value="stars">⭐ по звёздам</option><option value="updated">🕒 по обновлению</option></select></div>
-            <div class="counter" id="counter">проектов: <span>0</span></div>
-        </div>
-        <div id="projects-grid" class="projects-grid"></div>
-        <div id="error-message" class="error-message" style="display: none;">⚠️ Не удалось загрузить проекты. <button id="retry">Повторить</button></div>
-    </section>
- 
-    <section id="news-section" class="section">
-        <div class="section-header"><h2>📰 Лента новостей</h2><p>Актуальные обновления проектов и анонсы</p></div>
-        <div id="news-container" class="news-grid"></div>
-    </section>
- 
-    <section id="comments-section" class="section">
-        <div class="section-header"><h2>💬 Гостевая книга</h2><p>Оставьте свой след</p></div>
-        <div class="comments-wrapper">
-            <div id="comments-list" class="comments-list"></div>
-            <div class="comment-form">
-                <h3>Написать сообщение</h3>
-                <input type="text" id="comment-name" placeholder="Ваше имя" maxlength="50">
-                <textarea id="comment-text" rows="3" placeholder="Текст сообщения..."></textarea>
-                <button id="submit-comment">Отправить</button>
+        <div class="shell">
+            <div class="section-hero">
+                <h2>Мои <span class="accent-word">репозитории</span></h2>
+                <p class="sub">Открытые проекты и эксперименты на GitHub</p>
+            </div>
+            <div class="toolbar">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" id="search" placeholder="Поиск по названию или описанию...">
+                </div>
+                <div class="sort-wrap">
+                    <span>Сортировка</span>
+                    <select id="sort">
+                        <option value="name">по имени</option>
+                        <option value="stars">⭐ по звёздам</option>
+                        <option value="updated">🕒 по дате</option>
+                    </select>
+                </div>
+                <div class="counter-pill" id="counter">репо: <span>0</span></div>
+            </div>
+            <div id="projects-grid" class="projects-grid"></div>
+            <div id="error-message" class="error-card" style="display:none;">
+                ⚠️ Не удалось загрузить проекты
+                <button id="retry">Повторить</button>
             </div>
         </div>
     </section>
- 
+
+    <!-- NEWS -->
+    <section id="news-section" class="section">
+        <div class="shell">
+            <div class="section-hero">
+                <h2>Лента <span class="accent-word">новостей</span></h2>
+                <p class="sub">Обновления проектов и анонсы</p>
+            </div>
+            <div id="news-container" class="news-grid"></div>
+        </div>
+    </section>
+
+    <!-- COMMENTS -->
+    <section id="comments-section" class="section">
+        <div class="shell">
+            <div class="section-hero">
+                <h2>Гостевая <span class="accent-word">книга</span></h2>
+                <p class="sub">Оставьте свой след</p>
+            </div>
+            <div class="comments-shell">
+                <div id="comments-list"></div>
+                <div class="comment-form-card">
+                    <h3>✍️ Написать сообщение</h3>
+                    <input type="text" id="comment-name" placeholder="Ваше имя" maxlength="50">
+                    <textarea id="comment-text" rows="3" placeholder="Текст сообщения..."></textarea>
+                    <button class="btn-primary" id="submit-comment">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
     <section id="contact-section" class="section">
-        <div class="section-header"><h2>📩 Связаться со мной</h2><p>Заполните форму — я получу ваше сообщение</p></div>
-        <div class="contact-card">
-            <form id="contact-form">
-                <div class="form-group"><label>Имя</label><input type="text" id="contact-name" required></div>
-                <div class="form-group"><label>Email</label><input type="email" id="contact-email" required></div>
-                <div class="form-group"><label>Сообщение</label><textarea id="contact-message" rows="4" required></textarea></div>
-                <button type="submit">📨 Отправить</button>
-                <div id="form-feedback" class="form-feedback"></div>
-            </form>
-            <div class="contact-note">
-                <p>✉️ Или напрямую: <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a><br>
-                🔗 <a href="https://github.com/MigunovIvan" target="_blank">GitHub</a></p>
+        <div class="shell">
+            <div class="section-hero">
+                <h2>Связаться <span class="accent-word">со мной</span></h2>
+                <p class="sub">Заполните форму — я получу ваше сообщение</p>
+            </div>
+            <div class="contact-shell">
+                <div class="contact-card">
+                    <form id="contact-form">
+                        <div class="field-group"><label>Имя</label><input type="text" id="contact-name" required></div>
+                        <div class="field-group"><label>Email</label><input type="email" id="contact-email" required></div>
+                        <div class="field-group"><label>Сообщение</label><textarea id="contact-message" rows="5" required></textarea></div>
+                        <button type="submit" class="btn-primary">📨 Отправить</button>
+                        <div id="form-feedback" class="form-feedback"></div>
+                    </form>
+                    <div class="contact-note">
+                        <p>✉️ <a href="mailto:ivan.migunov1997@gmail.com">ivan.migunov1997@gmail.com</a> &nbsp;·&nbsp; 🔗 <a href="https://github.com/MigunovIvan" target="_blank">GitHub</a></p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 </main>
- 
+
 <footer>
-    <p>© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></p>
-    <div class="admin-toggle">
-        <button id="show-admin-login" class="admin-login-btn">🔐 Вход для админа</button>
+    <div class="footer-inner">
+        <div class="footer-copy">© 2025 · <a href="https://github.com/MigunovIvan" target="_blank">MigunovIvan</a></div>
+        <button id="show-admin-login" class="admin-trigger-btn">🔐 Вход для админа</button>
     </div>
 </footer>
- 
-<!-- Админ-панель -->
-<div id="admin-panel" style="display: none;">
-    <div class="admin-panel">
-        <div style="max-width:1200px; margin:0 auto; padding: 0 20px;">
- 
-            <!-- Форма входа -->
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel" style="display:none;">
+    <div class="admin-wrap">
+        <div class="admin-shell">
+
+            <!-- Login -->
             <div id="admin-login-area">
-                <div class="admin-login-form">
-                    <h3>Вход в админ-панель</h3>
-                    <div id="admin-login-error" style="color:red; margin-bottom:10px;"></div>
+                <div class="admin-login-card">
+                    <h3>🔐 Панель администратора</h3>
+                    <div id="admin-login-error"></div>
                     <input type="email" id="admin-email" placeholder="Email">
                     <input type="password" id="admin-password" placeholder="Пароль">
                     <button id="admin-login-btn">Войти</button>
                 </div>
             </div>
- 
-            <!-- Контент после входа -->
-            <div id="admin-content-area" style="display: none;">
-                <div class="admin-controls">
-                    <button id="admin-messages-tab">📨 Сообщения</button>
-                    <button id="admin-comments-tab">💬 Комментарии</button>
-                    <button id="admin-news-tab">📰 Новости</button>
-                    <button id="admin-logout-btn">🚪 Выйти</button>
+
+            <!-- Content -->
+            <div id="admin-content-area" style="display:none;">
+                <div class="admin-tabs">
+                    <button id="admin-messages-tab" class="admin-tab-btn active">📨 Сообщения</button>
+                    <button id="admin-comments-tab" class="admin-tab-btn">💬 Комментарии</button>
+                    <button id="admin-news-tab" class="admin-tab-btn">📰 Новости</button>
+                    <button id="admin-logout-btn" class="admin-tab-btn danger">🚪 Выйти</button>
                 </div>
-                <div id="admin-messages-section" class="admin-section">
+
+                <div id="admin-messages-section" class="admin-section active">
                     <div class="admin-card"><h3>Сообщения из формы</h3><div id="admin-messages-list"></div></div>
                 </div>
                 <div id="admin-comments-section" class="admin-section">
                     <div class="admin-card"><h3>Комментарии гостевой книги</h3><div id="admin-comments-list"></div></div>
                 </div>
                 <div id="admin-news-section" class="admin-section">
-                    <div class="news-form">
+                    <div class="news-form-card">
                         <h3>➕ Добавить новость</h3>
                         <input type="text" id="admin-news-title" placeholder="Заголовок">
                         <input type="text" id="admin-news-date" placeholder="Дата YYYY-MM-DD">
                         <textarea id="admin-news-content" rows="3" placeholder="Текст новости..."></textarea>
-                        <button id="admin-create-news">Создать</button>
+                        <button class="btn-primary" id="admin-create-news">Создать</button>
                     </div>
                     <div class="admin-card"><h3>Существующие новости</h3><div id="admin-news-list"></div></div>
                 </div>
             </div>
- 
+
         </div>
     </div>
 </div>
- 
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
- 
+
     const firebaseConfig = {
         apiKey: "AIzaSyDGrdrmsWp18842rihsFVIThPmIZEozTtE",
         authDomain: "github-9265f.firebaseapp.com",
@@ -569,309 +1016,270 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
- 
-    // ---------- ТЁМНАЯ ТЕМА ----------
+
+    // ── THEME ──
     const themeBtn = document.getElementById('toggle-theme');
     function loadTheme() {
         const saved = localStorage.getItem('theme');
-        if (saved === 'dark') {
-            document.body.classList.add('dark');
-            themeBtn.textContent = '☀️';
-        } else if (saved === 'light') {
-            document.body.classList.remove('dark');
-            themeBtn.textContent = '🌙';
-        } else {
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.body.classList.add('dark');
-                themeBtn.textContent = '☀️';
-            } else {
-                themeBtn.textContent = '🌙';
-            }
-        }
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = saved ? saved === 'dark' : prefersDark;
+        document.body.classList.toggle('light', !isDark);
+        themeBtn.textContent = isDark ? '🌙' : '☀️';
     }
     themeBtn.addEventListener('click', () => {
-        const isDark = document.body.classList.toggle('dark');
-        themeBtn.textContent = isDark ? '☀️' : '🌙';
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        const isLight = document.body.classList.toggle('light');
+        themeBtn.textContent = isLight ? '☀️' : '🌙';
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
     });
     loadTheme();
- 
-    // ---------- НАВИГАЦИЯ ----------
+
+    // ── NAV ──
     const navBtns = document.querySelectorAll('.nav-btn');
     const sections = document.querySelectorAll('.section');
-    function switchSection(sectionId) {
+    function switchSection(id) {
         sections.forEach(s => s.classList.remove('active'));
-        document.getElementById(`${sectionId}-section`).classList.add('active');
-        navBtns.forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.section === sectionId) btn.classList.add('active');
-        });
-        if (sectionId === 'comments') loadComments();
-        if (sectionId === 'news') loadNews();
+        document.getElementById(`${id}-section`).classList.add('active');
+        navBtns.forEach(b => { b.classList.toggle('active', b.dataset.section === id); });
+        if (id === 'comments') loadComments();
+        if (id === 'news') loadNews();
     }
-    navBtns.forEach(btn => btn.addEventListener('click', () => switchSection(btn.dataset.section)));
- 
-    // ---------- ПРОЕКТЫ (GITHUB) ----------
-    const projectsGrid = document.getElementById('projects-grid');
+    navBtns.forEach(b => b.addEventListener('click', () => switchSection(b.dataset.section)));
+
+    // ── PROJECTS ──
+    const grid = document.getElementById('projects-grid');
     const searchInput = document.getElementById('search');
     const sortSelect = document.getElementById('sort');
     const counterSpan = document.querySelector('#counter span');
-    const errorMsgDiv = document.getElementById('error-message');
-    const retryBtn = document.getElementById('retry');
+    const errorDiv = document.getElementById('error-message');
     let allProjects = [];
     const GITHUB_USER = 'MigunovIvan';
- 
-    function escapeHtml(str) {
+
+    function esc(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+        return str.replace(/[&<>]/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[m]));
     }
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return '—';
-        return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    function fmtDate(d) {
+        const date = new Date(d);
+        return isNaN(date) ? '—' : date.toLocaleDateString('ru-RU', { day:'numeric', month:'short', year:'numeric' });
     }
-    function createCard(project) {
+
+    function createCard(p) {
         const card = document.createElement('div');
         card.className = 'project-card';
+
         const img = document.createElement('img');
         img.className = 'project-img';
-        img.src = `images/${project.name}.png`;
-        img.alt = project.name;
+        img.src = `images/${p.name}.png`;
+        img.alt = p.name;
         img.onerror = () => {
-            const fallback = document.createElement('div');
-            fallback.className = 'img-fallback';
-            fallback.innerHTML = `📁 ${escapeHtml(project.name.slice(0, 20))}`;
-            img.replaceWith(fallback);
+            const fb = document.createElement('div');
+            fb.className = 'img-fallback';
+            fb.textContent = '📁';
+            img.replaceWith(fb);
         };
-        const stars = project.stargazers_count || 0;
-        const updated = formatDate(project.updated_at);
+
         const body = document.createElement('div');
         body.className = 'card-body';
         body.innerHTML = `
-            <div class="project-name">${escapeHtml(project.name)}</div>
-            <div class="project-desc">${escapeHtml(project.description) || '— без описания —'}</div>
-            <div class="project-meta"><span>⭐ ${stars}</span><span>🕒 ${updated}</span><span>💻 ${escapeHtml(project.language) || '—'}</span></div>
-            <a href="${project.html_url}" class="project-link" target="_blank">Открыть на GitHub →</a>
+            <div class="card-lang">${esc(p.language) || 'unknown'}</div>
+            <div class="project-name">${esc(p.name)}</div>
+            <div class="project-desc">${esc(p.description) || '— без описания —'}</div>
+            <div class="project-meta">
+                <span>⭐ ${p.stargazers_count || 0}</span>
+                <span>🕒 ${fmtDate(p.updated_at)}</span>
+            </div>
+            <a href="${p.html_url}" class="project-link" target="_blank">Открыть на GitHub →</a>
         `;
         card.appendChild(img);
         card.appendChild(body);
         return card;
     }
+
     function renderProjects() {
         const q = searchInput.value.trim().toLowerCase();
-        let filtered = allProjects.filter(p => p.name.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q)));
-        const sortType = sortSelect.value;
-        if (sortType === 'stars') filtered.sort((a,b) => b.stargazers_count - a.stargazers_count);
-        else if (sortType === 'updated') filtered.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
-        else filtered.sort((a,b) => a.name.localeCompare(b.name));
-        counterSpan.textContent = filtered.length;
-        projectsGrid.innerHTML = '';
-        if (filtered.length === 0) {
-            projectsGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px;">😕 Нет проектов</div>`;
-            return;
-        }
-        filtered.forEach(p => projectsGrid.appendChild(createCard(p)));
+        let list = allProjects.filter(p => p.name.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q)));
+        const sort = sortSelect.value;
+        if (sort === 'stars') list.sort((a,b) => b.stargazers_count - a.stargazers_count);
+        else if (sort === 'updated') list.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+        else list.sort((a,b) => a.name.localeCompare(b.name));
+        counterSpan.textContent = list.length;
+        grid.innerHTML = '';
+        if (!list.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--text-muted)">😕 Нет проектов</div>'; return; }
+        list.forEach(p => grid.appendChild(createCard(p)));
     }
+
     function showSkeletons() {
-        projectsGrid.innerHTML = '';
+        grid.innerHTML = '';
         for (let i = 0; i < 6; i++) {
-            const skeleton = document.createElement('div');
-            skeleton.className = 'skeleton';
-            skeleton.innerHTML = `<div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line" style="width:40%"></div></div>`;
-            projectsGrid.appendChild(skeleton);
+            const s = document.createElement('div');
+            s.className = 'skeleton';
+            s.innerHTML = `<div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:40%"></div><div class="skeleton-line"></div><div class="skeleton-line" style="width:70%"></div></div>`;
+            grid.appendChild(s);
         }
     }
+
     async function loadProjects() {
         showSkeletons();
-        errorMsgDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
         try {
             const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=100`);
-            if (!res.ok) throw new Error(`Ошибка ${res.status}`);
+            if (!res.ok) throw new Error();
             const repos = await res.json();
             allProjects = repos.filter(r => !r.fork);
-            if (allProjects.length === 0) projectsGrid.innerHTML = '<div style="grid-column:1/-1; text-align:center">📭 Нет репозиториев</div>';
-            else renderProjects();
-        } catch (err) {
-            errorMsgDiv.style.display = 'block';
-            projectsGrid.innerHTML = '';
+            renderProjects();
+        } catch {
+            errorDiv.style.display = 'block';
+            grid.innerHTML = '';
         }
     }
+
     searchInput?.addEventListener('input', renderProjects);
     sortSelect?.addEventListener('change', renderProjects);
-    retryBtn?.addEventListener('click', loadProjects);
- 
-    // ---------- НОВОСТИ (FIREBASE + README) ----------
-    async function fetchReadmeForRepo(repoName, repoUpdatedAt) {
-        const cacheKey = `readme_${repoName}`;
-        const cached = localStorage.getItem(cacheKey);
+    document.getElementById('retry')?.addEventListener('click', loadProjects);
+
+    // ── NEWS ──
+    async function fetchReadme(name, updatedAt) {
+        const key = `readme_${name}`;
+        const cached = localStorage.getItem(key);
         if (cached) {
             try {
-                const { data, timestamp, updatedAt } = JSON.parse(cached);
-                if (updatedAt === repoUpdatedAt && (Date.now() - timestamp) < 3600000) return data;
-            } catch(e) {}
+                const { data, timestamp, updatedAt: ua } = JSON.parse(cached);
+                if (ua === updatedAt && Date.now() - timestamp < 3600000) return data;
+            } catch {}
         }
         try {
-            const url = `https://api.github.com/repos/${GITHUB_USER}/${repoName}/readme`;
-            const res = await fetch(url, { headers: { 'Accept': 'application/vnd.github.v3.raw' } });
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_USER}/${name}/readme`, { headers: { Accept: 'application/vnd.github.v3.raw' } });
             if (!res.ok) return null;
             let text = await res.text();
-            let plain = text.replace(/[#*`_\[\]()]/g, '').trim();
-            plain = plain.length > 200 ? plain.slice(0,200)+'…' : plain;
-            const data = { text: plain, repoName, updatedAt: repoUpdatedAt };
-            localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now(), updatedAt: repoUpdatedAt }));
+            let plain = text.replace(/[#*`_\[\]()]/g,'').trim();
+            plain = plain.length > 200 ? plain.slice(0,200) + '…' : plain;
+            const data = { text: plain };
+            localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now(), updatedAt }));
             return data;
-        } catch(err) { return null; }
+        } catch { return null; }
     }
+
     async function loadNews() {
-        const newsContainer = document.getElementById('news-container');
-        if (!newsContainer) return;
-        newsContainer.innerHTML = '<div class="news-card">📡 Загрузка...</div>';
-        let allNewsItems = [];
+        const container = document.getElementById('news-container');
+        if (!container) return;
+        container.innerHTML = '<div class="news-card"><div class="news-tag">Загрузка</div><div class="news-title">📡 Получаем новости...</div></div>';
+        let items = [];
         try {
             const q = query(collection(db, 'news'), orderBy('date', 'desc'));
-            const snapshot = await getDocs(q);
-            snapshot.forEach(docSnap => {
-                const n = docSnap.data();
-                if (n.date && !isNaN(new Date(n.date).getTime())) {
-                    allNewsItems.push({ type: 'manual', title: n.title, date: n.date, content: n.content, url: null });
-                }
+            const snap = await getDocs(q);
+            snap.forEach(d => {
+                const n = d.data();
+                if (n.date && !isNaN(new Date(n.date))) items.push({ type: 'manual', ...n });
             });
-        } catch(e) { console.error(e); }
-        if (allProjects.length === 0) await new Promise(resolve => setTimeout(resolve, 1500));
-        const readmePromises = allProjects.map(async (p) => {
-            const readme = await fetchReadmeForRepo(p.name, p.updated_at);
-            if (!readme) return null;
+        } catch {}
+        if (!allProjects.length) await new Promise(r => setTimeout(r, 1500));
+        const readmes = await Promise.all(allProjects.map(async p => {
+            const rm = await fetchReadme(p.name, p.updated_at);
+            if (!rm) return null;
             const date = p.updated_at.slice(0,10);
-            if (date && !isNaN(new Date(date).getTime())) {
-                return { type: 'project', title: `📁 ${p.name}`, date: date, content: readme.text, url: p.html_url };
-            }
-            return null;
-        });
-        const projectNews = (await Promise.all(readmePromises)).filter(i => i);
-        allNewsItems.push(...projectNews);
-        allNewsItems.sort((a,b) => new Date(b.date) - new Date(a.date));
-        if (allNewsItems.length === 0) {
-            newsContainer.innerHTML = '<div class="news-card">Новостей нет</div>';
-            return;
-        }
-        newsContainer.innerHTML = '';
-        for (const item of allNewsItems) {
+            return { type: 'project', title: p.name, date, content: rm.text, url: p.html_url };
+        }));
+        items.push(...readmes.filter(Boolean));
+        items.sort((a,b) => new Date(b.date) - new Date(a.date));
+        if (!items.length) { container.innerHTML = '<div class="news-card">Новостей нет</div>'; return; }
+        container.innerHTML = '';
+        items.forEach(item => {
             const card = document.createElement('div');
             card.className = 'news-card';
             if (item.type === 'manual') {
-                card.innerHTML = `<div class="news-title">📰 ${escapeHtml(item.title)}</div><div class="news-date">📅 ${formatDate(item.date)}</div><div class="news-content">${escapeHtml(item.content)}</div>`;
+                card.innerHTML = `<div class="news-tag">📰 Новость</div><div class="news-title">${esc(item.title)}</div><div class="news-date">📅 ${fmtDate(item.date)}</div><div class="news-content">${esc(item.content)}</div>`;
             } else {
-                card.innerHTML = `<div class="news-title">${escapeHtml(item.title)}</div><div class="news-date">🕒 Обновлён: ${formatDate(item.date)}</div><div class="news-content">${escapeHtml(item.content)}</div><a href="${item.url}" target="_blank" class="project-link">🔗 Подробнее</a>`;
+                card.innerHTML = `<div class="news-tag">📁 Проект</div><div class="news-title">${esc(item.title)}</div><div class="news-date">🕒 Обновлён: ${fmtDate(item.date)}</div><div class="news-content">${esc(item.content)}</div><a href="${item.url}" class="news-link" target="_blank">Открыть репозиторий →</a>`;
             }
-            newsContainer.appendChild(card);
-        }
+            container.appendChild(card);
+        });
     }
- 
-    // ---------- ГОСТЕВАЯ КНИГА ----------
+
+    // ── COMMENTS ──
     async function loadComments() {
         const container = document.getElementById('comments-list');
         if (!container) return;
-        container.innerHTML = '<div class="comment-item">Загрузка...</div>';
+        container.innerHTML = '<div class="comment-item"><div class="comment-text">Загрузка...</div></div>';
         try {
             const q = query(collection(db, 'comments'), orderBy('timestamp', 'desc'));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) { container.innerHTML = '<div class="comment-item">Пока нет комментариев</div>'; return; }
+            const snap = await getDocs(q);
+            if (snap.empty) { container.innerHTML = '<div class="comment-item"><div class="comment-text">Пока нет комментариев</div></div>'; return; }
             container.innerHTML = '';
-            snapshot.forEach(docSnap => {
-                const c = docSnap.data();
-                const date = c.timestamp?.toDate().toLocaleString() || 'только что';
+            snap.forEach(d => {
+                const c = d.data();
                 const div = document.createElement('div');
                 div.className = 'comment-item';
-                div.innerHTML = `<div class="comment-author">✍️ ${escapeHtml(c.name)}</div><div class="comment-date">🕒 ${date}</div><div class="comment-text">${escapeHtml(c.text)}</div>`;
+                div.innerHTML = `<div class="comment-author">✍️ ${esc(c.name)}</div><div class="comment-date">🕒 ${c.timestamp?.toDate().toLocaleString() || 'только что'}</div><div class="comment-text">${esc(c.text)}</div>`;
                 container.appendChild(div);
             });
-        } catch(e) { container.innerHTML = '<div class="comment-item">Ошибка загрузки</div>'; }
+        } catch { container.innerHTML = '<div class="comment-item">Ошибка загрузки</div>'; }
     }
-    async function addComment(name, text) {
-        if (!name.trim() || !text.trim()) { alert("Заполните поля"); return false; }
-        try {
-            await addDoc(collection(db, 'comments'), { name: name.trim(), text: text.trim(), timestamp: serverTimestamp() });
-            return true;
-        } catch(e) { alert("Ошибка"); return false; }
-    }
+
     document.getElementById('submit-comment')?.addEventListener('click', async () => {
         const name = document.getElementById('comment-name').value;
         const text = document.getElementById('comment-text').value;
-        if (await addComment(name, text)) {
+        if (!name.trim() || !text.trim()) { alert('Заполните поля'); return; }
+        try {
+            await addDoc(collection(db, 'comments'), { name: name.trim(), text: text.trim(), timestamp: serverTimestamp() });
             document.getElementById('comment-name').value = '';
             document.getElementById('comment-text').value = '';
             loadComments();
-        }
+        } catch { alert('Ошибка'); }
     });
- 
-    // ---------- ФОРМА СВЯЗИ ----------
-    const contactForm = document.getElementById('contact-form');
-    const formFeedback = document.getElementById('form-feedback');
-    contactForm?.addEventListener('submit', async (e) => {
+
+    // ── CONTACT FORM ──
+    document.getElementById('contact-form')?.addEventListener('submit', async e => {
         e.preventDefault();
         const name = document.getElementById('contact-name').value.trim();
         const email = document.getElementById('contact-email').value.trim();
         const message = document.getElementById('contact-message').value.trim();
-        if (!name || !email || !message) { formFeedback.innerHTML = '<span style="color:red;">Заполните все поля</span>'; return; }
-        if (!email.includes('@')) { formFeedback.innerHTML = '<span style="color:red;">Некорректный email</span>'; return; }
-        formFeedback.innerHTML = '<span style="color:#0066cc;">Отправка...</span>';
+        const fb = document.getElementById('form-feedback');
+        if (!name || !email || !message) { fb.innerHTML = '<span style="color:#fc7171">Заполните все поля</span>'; return; }
+        if (!email.includes('@')) { fb.innerHTML = '<span style="color:#fc7171">Некорректный email</span>'; return; }
+        fb.innerHTML = '<span style="color:var(--accent)">Отправка...</span>';
         try {
             await addDoc(collection(db, 'messages'), { name, email, message, timestamp: serverTimestamp(), read: false });
-            formFeedback.innerHTML = '<span style="color:green;">✅ Сообщение отправлено!</span>';
-            contactForm.reset();
-            setTimeout(() => formFeedback.innerHTML = '', 4000);
-        } catch(err) { formFeedback.innerHTML = '<span style="color:red;">Ошибка</span>'; }
+            fb.innerHTML = '<span style="color:var(--accent)">✅ Сообщение отправлено!</span>';
+            e.target.reset();
+            setTimeout(() => fb.innerHTML = '', 4000);
+        } catch { fb.innerHTML = '<span style="color:#fc7171">Ошибка</span>'; }
     });
- 
-    // ---------- АДМИН-ПАНЕЛЬ ----------
+
+    // ── ADMIN ──
     const adminPanel = document.getElementById('admin-panel');
     const adminLoginArea = document.getElementById('admin-login-area');
     const adminContentArea = document.getElementById('admin-content-area');
-    const showAdminBtn = document.getElementById('show-admin-login');
- 
-    const showAdminTab = (tabId) => {
-        document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-    };
- 
-    showAdminBtn?.addEventListener('click', () => {
-        const isHidden = adminPanel.style.display === 'none' || adminPanel.style.display === '';
-        adminPanel.style.display = isHidden ? 'block' : 'none';
-        if (isHidden) {
-            const user = auth.currentUser;
-            if (user) {
+
+    document.getElementById('show-admin-login')?.addEventListener('click', () => {
+        const hidden = adminPanel.style.display === 'none' || !adminPanel.style.display;
+        adminPanel.style.display = hidden ? 'block' : 'none';
+        if (hidden) {
+            if (auth.currentUser) {
                 adminLoginArea.style.display = 'none';
                 adminContentArea.style.display = 'block';
-                loadAdminMessages();
-                loadAdminComments();
-                loadAdminNews();
-                showAdminTab('admin-messages-section');
+                loadAdminMessages(); loadAdminComments(); loadAdminNews();
             } else {
                 adminLoginArea.style.display = 'block';
                 adminContentArea.style.display = 'none';
             }
         }
     });
- 
+
     document.getElementById('admin-login-btn')?.addEventListener('click', async () => {
         const email = document.getElementById('admin-email').value.trim();
-        const password = document.getElementById('admin-password').value;
-        const errorDiv = document.getElementById('admin-login-error');
-        errorDiv.textContent = '';
-        if (!email || !password) { errorDiv.textContent = 'Введите email и пароль'; return; }
+        const pass = document.getElementById('admin-password').value;
+        const err = document.getElementById('admin-login-error');
+        err.textContent = '';
+        if (!email || !pass) { err.textContent = 'Введите email и пароль'; return; }
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(auth, email, pass);
             adminLoginArea.style.display = 'none';
             adminContentArea.style.display = 'block';
-            loadAdminMessages();
-            loadAdminComments();
-            loadAdminNews();
+            loadAdminMessages(); loadAdminComments(); loadAdminNews();
             showAdminTab('admin-messages-section');
-        } catch(err) {
-            errorDiv.textContent = 'Неверный email или пароль';
-        }
+        } catch { err.textContent = 'Неверный email или пароль'; }
     });
- 
+
     document.getElementById('admin-logout-btn')?.addEventListener('click', async () => {
         await signOut(auth);
         adminContentArea.style.display = 'none';
@@ -879,145 +1287,106 @@
         document.getElementById('admin-email').value = '';
         document.getElementById('admin-password').value = '';
     });
- 
+
+    function showAdminTab(id) {
+        document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.admin-tab-btn:not(.danger)').forEach(b => {
+            b.classList.toggle('active', b.id === id.replace('-section','-tab'));
+        });
+    }
+
     document.getElementById('admin-messages-tab')?.addEventListener('click', () => showAdminTab('admin-messages-section'));
     document.getElementById('admin-comments-tab')?.addEventListener('click', () => showAdminTab('admin-comments-section'));
     document.getElementById('admin-news-tab')?.addEventListener('click', () => showAdminTab('admin-news-section'));
- 
-    // ---------- ДАННЫЕ АДМИНКИ ----------
+
     async function loadAdminMessages() {
         const container = document.getElementById('admin-messages-list');
         if (!container) return;
-        container.innerHTML = '<p>Загрузка...</p>';
+        container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Загрузка...</p>';
         try {
             const q = query(collection(db, 'messages'), orderBy('timestamp', 'desc'));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) { container.innerHTML = '<p>Нет сообщений</p>'; return; }
+            const snap = await getDocs(q);
+            if (snap.empty) { container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Нет сообщений</p>'; return; }
             container.innerHTML = '';
-            for (const docSnap of snapshot.docs) {
-                const msg = docSnap.data();
-                const id = docSnap.id;
-                const date = msg.timestamp?.toDate().toLocaleString() || 'без даты';
+            snap.docs.forEach(docSnap => {
+                const msg = docSnap.data(), id = docSnap.id;
+                const date = msg.timestamp?.toDate().toLocaleString() || '—';
                 const div = document.createElement('div');
                 div.className = 'message-item';
                 div.innerHTML = `
-                    <div><strong>${escapeHtml(msg.name)}</strong> (${escapeHtml(msg.email)}) <span class="badge ${msg.read ? '' : 'unread'}">${msg.read ? 'Прочитано' : 'Новое'}</span></div>
-                    <div style="margin-top:6px;">${escapeHtml(msg.message)}</div>
-                    <div style="font-size:0.75rem; margin-top:5px; color:#6c757d;">${date}</div>
+                    <div><strong>${esc(msg.name)}</strong> (${esc(msg.email)}) <span class="badge ${msg.read ? '' : 'unread'}">${msg.read ? 'Прочитано' : 'Новое'}</span></div>
+                    <div style="margin-top:6px;font-size:.85rem;color:var(--text-dim)">${esc(msg.message)}</div>
+                    <div style="font-size:.7rem;margin-top:4px;color:var(--text-muted);font-family:var(--font-mono)">${date}</div>
                     <div style="margin-top:8px;">
-                        ${!msg.read ? `<button class="small" data-id="${id}" data-action="mark">📖 Прочитано</button>` : ''}
-                        <button class="small delete" data-id="${id}" data-action="delete">🗑 Удалить</button>
-                    </div>
-                `;
+                        ${!msg.read ? `<button class="small-btn" data-id="${id}" data-action="mark">📖 Прочитано</button>` : ''}
+                        <button class="small-btn delete" data-id="${id}" data-action="delete">🗑 Удалить</button>
+                    </div>`;
                 container.appendChild(div);
-            }
-            container.querySelectorAll('button[data-action="mark"]').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    await updateDoc(doc(db, 'messages', btn.dataset.id), { read: true });
-                    loadAdminMessages();
-                });
             });
-            container.querySelectorAll('button[data-action="delete"]').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (confirm('Удалить сообщение?')) {
-                        await deleteDoc(doc(db, 'messages', btn.dataset.id));
-                        loadAdminMessages();
-                    }
-                });
-            });
-        } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; console.error(e); }
+            container.querySelectorAll('[data-action="mark"]').forEach(btn => btn.addEventListener('click', async () => { await updateDoc(doc(db,'messages',btn.dataset.id),{read:true}); loadAdminMessages(); }));
+            container.querySelectorAll('[data-action="delete"]').forEach(btn => btn.addEventListener('click', async () => { if(confirm('Удалить?')){ await deleteDoc(doc(db,'messages',btn.dataset.id)); loadAdminMessages(); } }));
+        } catch(e) { container.innerHTML = '<p style="color:#fc7171">Ошибка</p>'; }
     }
- 
+
     async function loadAdminComments() {
         const container = document.getElementById('admin-comments-list');
         if (!container) return;
-        container.innerHTML = '<p>Загрузка...</p>';
+        container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Загрузка...</p>';
         try {
-            const q = query(collection(db, 'comments'), orderBy('timestamp', 'desc'));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) { container.innerHTML = '<p>Нет комментариев</p>'; return; }
+            const q = query(collection(db,'comments'), orderBy('timestamp','desc'));
+            const snap = await getDocs(q);
+            if (snap.empty) { container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Нет комментариев</p>'; return; }
             container.innerHTML = '';
-            for (const docSnap of snapshot.docs) {
-                const comm = docSnap.data();
-                const id = docSnap.id;
-                const date = comm.timestamp?.toDate().toLocaleString() || 'только что';
+            snap.docs.forEach(docSnap => {
+                const c = docSnap.data(), id = docSnap.id;
                 const div = document.createElement('div');
                 div.className = 'comment-item';
-                div.innerHTML = `
-                    <div><strong>${escapeHtml(comm.name)}</strong> <button class="small delete" data-id="${id}">🗑 Удалить</button></div>
-                    <div style="margin-top:6px;">${escapeHtml(comm.text)}</div>
-                    <div style="font-size:0.75rem; margin-top:4px; color:#6c757d;">${date}</div>
-                `;
+                div.style.cssText = 'border-radius:12px;margin-bottom:10px;';
+                div.innerHTML = `<div><strong>${esc(c.name)}</strong> <button class="small-btn delete" data-id="${id}">🗑</button></div><div style="margin-top:6px;font-size:.85rem;color:var(--text-dim)">${esc(c.text)}</div><div style="font-size:.7rem;color:var(--text-muted);font-family:var(--font-mono)">${c.timestamp?.toDate().toLocaleString()||'—'}</div>`;
                 container.appendChild(div);
-            }
-            container.querySelectorAll('.delete').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (confirm('Удалить комментарий?')) {
-                        await deleteDoc(doc(db, 'comments', btn.dataset.id));
-                        loadAdminComments();
-                    }
-                });
             });
-        } catch(e) { container.innerHTML = '<p>Ошибка загрузки</p>'; console.error(e); }
+            container.querySelectorAll('.delete').forEach(btn => btn.addEventListener('click', async () => { if(confirm('Удалить?')){ await deleteDoc(doc(db,'comments',btn.dataset.id)); loadAdminComments(); } }));
+        } catch { container.innerHTML = '<p style="color:#fc7171">Ошибка</p>'; }
     }
- 
+
     async function loadAdminNews() {
         const container = document.getElementById('admin-news-list');
         if (!container) return;
-        container.innerHTML = '<p>Загрузка...</p>';
+        container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Загрузка...</p>';
         try {
-            const q = query(collection(db, 'news'), orderBy('date', 'desc'));
-            const snapshot = await getDocs(q);
-            if (snapshot.empty) { container.innerHTML = '<p>Нет новостей</p>'; return; }
+            const q = query(collection(db,'news'), orderBy('date','desc'));
+            const snap = await getDocs(q);
+            if (snap.empty) { container.innerHTML = '<p style="color:var(--text-muted);font-size:.85rem">Нет новостей</p>'; return; }
             container.innerHTML = '';
-            for (const docSnap of snapshot.docs) {
-                const news = docSnap.data();
-                const id = docSnap.id;
+            snap.docs.forEach(docSnap => {
+                const n = docSnap.data(), id = docSnap.id;
                 const div = document.createElement('div');
                 div.className = 'news-item';
-                div.innerHTML = `
-                    <div><strong>${escapeHtml(news.title)}</strong></div>
-                    <div style="margin-top:4px;">${escapeHtml(news.content)}</div>
-                    <div style="font-size:0.75rem; margin-top:4px; color:#6c757d;">📅 ${news.date}</div>
-                    <button class="small delete" data-id="${id}" style="margin-top:8px;">🗑 Удалить</button>
-                `;
+                div.innerHTML = `<div><strong>${esc(n.title)}</strong> <button class="small-btn delete" data-id="${id}">🗑 Удалить</button></div><div style="font-size:.82rem;color:var(--text-dim);margin-top:4px">${esc(n.content)}</div><div style="font-size:.7rem;color:var(--text-muted);font-family:var(--font-mono);margin-top:4px">📅 ${n.date}</div>`;
                 container.appendChild(div);
-            }
-            container.querySelectorAll('.delete').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (confirm('Удалить новость?')) {
-                        await deleteDoc(doc(db, 'news', btn.dataset.id));
-                        loadAdminNews();
-                        loadNews();
-                    }
-                });
             });
-        } catch(e) {
-            container.innerHTML = '<p>Ошибка загрузки</p>';
-            console.error(e);
-        }
+            container.querySelectorAll('.delete').forEach(btn => btn.addEventListener('click', async () => { if(confirm('Удалить новость?')){ await deleteDoc(doc(db,'news',btn.dataset.id)); loadAdminNews(); loadNews(); } }));
+        } catch { container.innerHTML = '<p style="color:#fc7171">Ошибка</p>'; }
     }
- 
+
     document.getElementById('admin-create-news')?.addEventListener('click', async () => {
         const title = document.getElementById('admin-news-title').value.trim();
         const date = document.getElementById('admin-news-date').value.trim();
         const content = document.getElementById('admin-news-content').value.trim();
         if (!title || !date || !content) { alert('Заполните все поля'); return; }
         try {
-            await addDoc(collection(db, 'news'), { title, date, content });
+            await addDoc(collection(db,'news'), { title, date, content });
             document.getElementById('admin-news-title').value = '';
             document.getElementById('admin-news-date').value = '';
             document.getElementById('admin-news-content').value = '';
-            loadAdminNews();
-            loadNews();
+            loadAdminNews(); loadNews();
             alert('Новость добавлена');
-        } catch(e) { alert('Ошибка добавления'); console.error(e); }
+        } catch { alert('Ошибка'); }
     });
- 
-    // ---------- СТАРТ ----------
+
+    // START
     loadProjects();
-    loadNews();
-    loadComments();
     switchSection('projects');
 </script>
 </body>
